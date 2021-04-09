@@ -58,6 +58,7 @@ var MyVARS = {
   enableMaxSongCheck: true,
   enableSongInHistCheck: true,
   language: "english",
+  meMode: true,					// Start all comments with /me
   maximumAfk: 60,
   maximumSongLength: 8,
   skipCooldown: false,
@@ -959,8 +960,10 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
       if (MyVARS.botMuted === true)
         MyUTIL.logInfo(msg);
-      else if (MyVARS.runningBot)
+      else if (MyVARS.runningBot) {
+		if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me")) msg = "/me " + msg;
         MyAPI.SendChat(msg);
+	  }
       else
         MyUTIL.logChat(msg);
     } 
@@ -3021,7 +3024,7 @@ var WAITLIST = {
 		setTimeout(function() { WAITLIST.QNextDJFromWaitlist(); }, 250);
 	  }
 	  else {
-	    MyUTIL.sendChat("@" + MyAPI.getChatRoomUser(nextDjId).username + 
+	    MyUTIL.sendChat("/me @" + MyAPI.getChatRoomUser(nextDjId).username + 
 		  " you have 45 seconds to hop up. (Waiting: " + (MyROOM.queue.id.length - 1) + ")");
 	    WAITLIST.waitingOnDj = true;
 		setTimeout(function() { 
