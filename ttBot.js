@@ -28,8 +28,10 @@
 // DONE: ImOut
 // DONE: Bot DJ
 
+// NEXT: THEME/GENRE  - No EDM or Kiddie songs.
+// NEXT: SONG NAME/ARTIST received :thumbsup: 2 :thumbsdown: 0 :heart: 0 
 // TODO: When a user joins the DJs, reset Lunch/Meeting breaks.
-// NEXT: BAN LIST
+// NEXT: SONG BAN LIST
 
 //SECTION SETTINGS: All local settings:
 var MyVARS = {
@@ -71,52 +73,52 @@ var MyVARS = {
 //SECTION MyCOMMENTS: All comments:
 var MyCOMMENTS = {
   tastyCommentArray: [
-    "*** Tasty point for you, you go Glen Coco!  (%%POINTFROM%%) *** :cake:",
-    "*** I don't feel I have to explain my fake points to you Warren. (%%POINTFROM%%) *** :cake:",
-    "*** %%POINTFROM%% thinks this song is aca-awesome *** :cake:",
-    "*** %%POINTFROM%% thinks this song is pretty fetch. Stop trying to make fetch happen. *** :cake:",
-    "*** %%POINTFROM%% thinks you might just be funky cold medina. *** :cake:",
-    "*** That tasty point from %%POINTFROM%% really brings the room together. *** :cake:",
-    "*** The jury may be out on this song but %%POINTFROM%% thinks it’s pretty tasty *** :cake:",
-    "*** %%POINTFROM%% salutes those who rock. *** :cake:",
-    "*** This tune is more soothing than Morgan Freeman's voice. (%%POINTFROM%%) *** :cake:",
-    "*** The Tasty Tasty cake is a lie. (%%POINTFROM%%) *** :cake:",
-    "*** You deserve a promotion. But since %%POINTFROM%% can't do that here, have a tasty point. *** :cake:",
-    "*** %%POINTFROM%% loves this tune more than bacon!  :pig: *** :cake:",
-    "*** %%POINTFROM%% thinks you listen to the coolest songs. *** :cake:",
-    "*** %%POINTFROM%% loves this song more than a drunk college student loves tacos. *** :cake:",
-    "*** Being awesome is hard, but you make it work. (%%POINTFROM%%) *** :cake:",
-    "*** %%POINTFROM%% likes your style.  *** :cake:",
-    "*** You have a good taste in tunes. (%%POINTFROM%%) *** :cake:",
-    "*** %%POINTFROM%% appreciates this tune more than Santa appreciates chimney grease. *** :cake:",
-    "*** This tune is sweeter than than a bucket of bon-bons! (%%POINTFROM%%) *** :cake:",
-    "*** %%POINTFROM%% enjoys your decision on playing this tune *** :cake:",
-    "*** %%POINTFROM%% finds this song is as fun as a hot tub full of chocolate pudding. *** :cake:",
-    "*** %%POINTFROM%% likes the cut of your jib. *** :cake:",
-    "*** %%POINTFROM%% thinks this song is smoother than a fresh jar of skippy. *** :cake:",
-    "*** %%POINTFROM%% can’t come up with something funny to say so here’s a worthless tasty point. *** :cake:",
-    "*** It may be 106 miles to Chicago but here’s a tasty point (%%POINTFROM%%) *** :cake:",
-    "*** Illinois Tasty Points? %%POINTFROM%% hates Illinois Tasty Points! *** :cake:",
-    "*** %%POINTFROM%% says 'Hey Girl, have a Tasty Point' *** :cake:",
-    "*** %%POINTFROM%% thinks you’re a tasty, tasty rockstar *** :cake:",
-    "*** He likes it. Mikey likes it! (%%POINTFROM%%) *** :cake:",
-    "*** Mmmm, doughnuts...(%%POINTFROM%%) *** :doughnut:",
-    "*** Dyn-Oh-Mite! (%%POINTFROM%%) *** :cake:",
-    "*** %%POINTFROM%% thinks this song is the bee’s knees *** :cake:",
-    "*** Now you’re on the trolley! (%%POINTFROM%%) *** :cake:",
-    "*** Thanks to Al Gore %%POINTFROM%% can give you this: *** :cake:",
-    "*** Goose, take me to bed or lose me forever. (%%POINTFROM%%) *** :cake:",
-    "*** If we weren’t on the internet %%POINTFROM%% would get you tin roof rusted. *** :cake:",
-    "*** :dancer: %%POINTFROM%% gave you a tasty point.  @Larry the Law will now dance the robot in your honor. :dancer: *** :cake:",
-    "*** Beanbags are great and so are you!! (%%POINTFROM%%) *** :cake:",
-    "*** That green jacket is within reach! (%%POINTFROM%%) *** :cake:",
-    "*** You're smarter than Google and Mary Poppins combined. (%%POINTFROM%%) *** :cake:",
-    "*** Hanging out with you is better than a party with unlimited juice. Which, as we all know, is off the hook. (%%POINTFROM%%) *** :cake:",
-    "*** Shit just got real. (%%POINTFROM%%) *** :cake:",
-    "*** This play is so awesome. It's like you are the superhero of Tasty Tunes. (%%POINTFROM%%) *** :cake:",
-    "*** Yeah... That's the ticket. (%%POINTFROM%%) *** :cake:",
-    "*** This tune is cooler than Mr. Rogers. Which may not seem like a big deal, but that dude would put on a different pair of shoes just to chill in his own home. And that's crazy cool!! (%%POINTFROM%%) *** :cake:",
-    "*** You are so rad!! (%%POINTFROM%%) *** :cake:"
+    "/me *** Tasty point for you, you go Glen Coco!  (%%POINTFROM%%) *** :cake:",
+    "/me *** I don't feel I have to explain my fake points to you Warren. (%%POINTFROM%%) *** :cake:",
+    "/me *** %%POINTFROM%% thinks this song is aca-awesome *** :cake:",
+    "/me *** %%POINTFROM%% thinks this song is pretty fetch. Stop trying to make fetch happen. *** :cake:",
+    "/me *** %%POINTFROM%% thinks you might just be funky cold medina. *** :cake:",
+    "/me *** That tasty point from %%POINTFROM%% really brings the room together. *** :cake:",
+    "/me *** The jury may be out on this song but %%POINTFROM%% thinks it’s pretty tasty *** :cake:",
+    "/me *** %%POINTFROM%% salutes those who rock. *** :cake:",
+    "/me *** This tune is more soothing than Morgan Freeman's voice. (%%POINTFROM%%) *** :cake:",
+    "/me *** The Tasty Tasty cake is a lie. (%%POINTFROM%%) *** :cake:",
+    "/me *** You deserve a promotion. But since %%POINTFROM%% can't do that here, have a tasty point. *** :cake:",
+    "/me *** %%POINTFROM%% loves this tune more than bacon!  :pig: *** :cake:",
+    "/me *** %%POINTFROM%% thinks you listen to the coolest songs. *** :cake:",
+    "/me *** %%POINTFROM%% loves this song more than a drunk college student loves tacos. *** :cake:",
+    "/me *** Being awesome is hard, but you make it work. (%%POINTFROM%%) *** :cake:",
+    "/me *** %%POINTFROM%% likes your style.  *** :cake:",
+    "/me *** You have a good taste in tunes. (%%POINTFROM%%) *** :cake:",
+    "/me *** %%POINTFROM%% appreciates this tune more than Santa appreciates chimney grease. *** :cake:",
+    "/me *** This tune is sweeter than than a bucket of bon-bons! (%%POINTFROM%%) *** :cake:",
+    "/me *** %%POINTFROM%% enjoys your decision on playing this tune *** :cake:",
+    "/me *** %%POINTFROM%% finds this song is as fun as a hot tub full of chocolate pudding. *** :cake:",
+    "/me *** %%POINTFROM%% likes the cut of your jib. *** :cake:",
+    "/me *** %%POINTFROM%% thinks this song is smoother than a fresh jar of skippy. *** :cake:",
+    "/me *** %%POINTFROM%% can’t come up with something funny to say so here’s a worthless tasty point. *** :cake:",
+    "/me *** It may be 106 miles to Chicago but here’s a tasty point (%%POINTFROM%%) *** :cake:",
+    "/me *** Illinois Tasty Points? %%POINTFROM%% hates Illinois Tasty Points! *** :cake:",
+    "/me *** %%POINTFROM%% says 'Hey Girl, have a Tasty Point' *** :cake:",
+    "/me *** %%POINTFROM%% thinks you’re a tasty, tasty rockstar *** :cake:",
+    "/me *** He likes it. Mikey likes it! (%%POINTFROM%%) *** :cake:",
+    "/me *** Mmmm, doughnuts...(%%POINTFROM%%) *** :doughnut:",
+    "/me *** Dyn-Oh-Mite! (%%POINTFROM%%) *** :cake:",
+    "/me *** %%POINTFROM%% thinks this song is the bee’s knees *** :cake:",
+    "/me *** Now you’re on the trolley! (%%POINTFROM%%) *** :cake:",
+    "/me *** Thanks to Al Gore %%POINTFROM%% can give you this: *** :cake:",
+    "/me *** Goose, take me to bed or lose me forever. (%%POINTFROM%%) *** :cake:",
+    "/me *** If we weren’t on the internet %%POINTFROM%% would get you tin roof rusted. *** :cake:",
+    "/me *** :dancer: %%POINTFROM%% gave you a tasty point.  @Larry the Law will now dance the robot in your honor. :dancer: *** :cake:",
+    "/me *** Beanbags are great and so are you!! (%%POINTFROM%%) *** :cake:",
+    "/me *** That green jacket is within reach! (%%POINTFROM%%) *** :cake:",
+    "/me *** You're smarter than Google and Mary Poppins combined. (%%POINTFROM%%) *** :cake:",
+    "/me *** Hanging out with you is better than a party with unlimited juice. Which, as we all know, is off the hook. (%%POINTFROM%%) *** :cake:",
+    "/me *** Shit just got real. (%%POINTFROM%%) *** :cake:",
+    "/me *** This play is so awesome. It's like you are the superhero of Tasty Tunes. (%%POINTFROM%%) *** :cake:",
+    "/me *** Yeah... That's the ticket. (%%POINTFROM%%) *** :cake:",
+    "/me *** This tune is cooler than Mr. Rogers. Which may not seem like a big deal, but that dude would put on a different pair of shoes just to chill in his own home. And that's crazy cool!! (%%POINTFROM%%) *** :cake:",
+    "/me *** You are so rad!! (%%POINTFROM%%) *** :cake:"
   ],
   howAreYouComments: [
     "Shitty, and yourself %%FU%%?",
@@ -1059,6 +1061,12 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.botKeepAlive: " + err.message); }
   },
+  botKeepAlive2: function() {
+    try {
+	  MyUTIL.logInfo(MyUTIL.formatDate(Date.now()));
+    } 
+	catch (err) { MyUTIL.logException("MyUTIL.botKeepAlive2: " + err.message); }
+  },
   canSkip: function() {
     try {
       var dj = USERS.getDJ();
@@ -1900,7 +1908,8 @@ var MyAPI = {
 			if (message.command) {
 			  if (message.command !== 'newsong' && message.command !== 'speak' && message.command !== 'update_votes'
 			     && message.command !== 'add_dj' && message.command !== 'rem_dj' && message.command !== 'nosong' 
-				 && message.command !== 'snagged' && message.command !== 'registered' && message.command !== 'deregistered') {
+				 && message.command !== 'snagged' && message.command !== 'registered' && message.command !== 'deregistered'
+				 && message.command !== 'update_user' ) {
 				MyUTIL.logDebug("NEW MESSAGE COMMAND: " + message.command);
 				MyUTIL.logObjects(message);
 			  }
@@ -1932,7 +1941,7 @@ var MyAPI = {
 			  if (MyAPI.CurrentRoomID() === message.roomid) {
 			    var user = USERS.lookupLocalUser(message.user[0].userid);
 			    if (user === false) return;
-			    MyUTIL.logObjects(message);
+			    //MyUTIL.logObjects(message);
 			    MyUTIL.sendChat("/me " + user.username + " split :dash:");
 			    //OLD: MyUTIL.sendChat("/me " + MyAPI.getChatRoomUser(message.user[0].userid).username + " split :dash:");
 			  }
@@ -3199,7 +3208,7 @@ var CHAT = {
         var cmdCall = BOTCOMMANDS[comm].command;
         if (!Array.isArray(cmdCall)) { cmdCall = [cmdCall] }
         for (var i = 0; i < cmdCall.length; i++) {
-          if (MyVARS.commandLiteral + cmdCall[i] === cmd) {
+          if (MyVARS.commandLiteral + cmdCall[i] == cmd) {
             BOTCOMMANDS[comm].functionality(chat, MyVARS.commandLiteral + cmdCall[i]);
             executed = true;
             break;
@@ -3630,16 +3639,18 @@ var BOTCOMMANDS = {
       }
     }
   },
-
   autowootCommand: {
-    command: 'autowoot',
+    command: ['autowoot', 'autowoot?','autobop', 'autobop?'],
     rank: 'user',
     type: 'exact',
     functionality: function(chat, cmd) {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat(CHAT.chatMapping.autowoot);
+        MyUTIL.sendChat("Here are two options for auto-wooting:");
+        setTimeout(function () { MyUTIL.sendChat("1. Chrome extension - TT Plugged in: https://chrome.google.com/webstore/detail/tt-plugged-in/edoelilfhbiliocedcghdffjnbnplcfb"); }, 250);
+		setTimeout(function () { MyUTIL.sendChat("2. Izzmo's bookmark link: http://www.pinnacleofdestruction.net/tt/?fbclid=IwAR1K7W4omY01rg0m3Pz8-_wEhmDb3VavgZr9HMC__KzEwGKX-ZAr79g9z8I"); }, 500);
+
       }
     }
   },
@@ -3744,9 +3755,8 @@ var BOTCOMMANDS = {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         MyVARS.autoWootBot = (!MyVARS.autoWootBot);
-      } catch (err) {
-        MyUTIL.logException("autowootbotCommand: " + err.message);
-      }
+      } 
+	  catch (err) { MyUTIL.logException("autowootbotCommand: " + err.message); }
     }
   },
 
@@ -6163,7 +6173,7 @@ var BOTCOMMANDS = {
   //        }
   //    }
   //},
-  autowootCommand: {
+  origemCommand: {
     command: 'origem',
     rank: 'user',
     type: 'exact',
@@ -6225,7 +6235,7 @@ var BOTCOMMANDS = {
     }
   },
   addmeCommand: {
-    command: ['q','qme','queueme','queue','wait','wl','addme'],
+    command: ['q','qme','queueme','queue','wait','addme'],
     rank: 'user',
     type: 'startsWith',
     functionality: function(chat, cmd) {
@@ -6237,7 +6247,7 @@ var BOTCOMMANDS = {
     }
   },
   removemeCommand: {
-    command: ['dq','removeme','uq','remove'],
+    command: ['dq','removeme','uq','remove','nowait'],
     rank: 'user',
     type: 'startsWith',
     functionality: function(chat, cmd) {
@@ -6649,6 +6659,21 @@ var BOTCOMMANDS = {
       } catch (err) {
         MyUTIL.logException("ughcommand: " + err.message);
       }
+    }
+  },
+  exwaitCommand: {
+    command: ['exwait', 'wait?','exwaitlist', 'waitlist?'],
+    rank: 'user',
+    type: 'exact',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+        MyUTIL.sendChat("Explain WAITLIST: To join the waitlist type: .wait or .addme");
+		setTimeout(function () { MyUTIL.sendChat("DJs removed to allow others on the waitlist to play a song, will automatically be added to the waitlist."); }, 500);
+		setTimeout(function () { MyUTIL.sendChat("To be removed from the waitlist type: .removeme"); }, 1000);
+	  } 		
+	  catch (err) { MyUTIL.logException("exrollcommand: " + err.message); }
     }
   },
   exrollCommand: {
@@ -7259,12 +7284,13 @@ var STORAGE = {
 
 //SECTION STARTUP: Init code:
 var STARTUP = {
-	initbot: function() {
+  initbot: function() {
       try{
         if (window.APIisRunning) return;
         window.APIisRunning = true;
 	    BotEVENTS.connectAPI();
         CHAT.loadChat();
+		STARTUP.monitorPageChange();
 		setTimeout( function() {
 		  STORAGE.retrieveSettings();
 		  STORAGE.retrieveFromStorage();
@@ -7273,10 +7299,24 @@ var STARTUP = {
 		setInterval(function() {AFK.checkBotDj()}, 10 * 1000);
 		MyUTIL.randomCommentSetTimer();												//Enable random comment timer
 		setInterval(function() { MyUTIL.botKeepAlive(); }, 1000 * 60 * 60);			//Timer fires every 60 mins to keep bot alive
+		setInterval(function() { MyUTIL.botKeepAlive2(); }, 1000 * 60);				//Timer fires every 1 mins to monitor bot alive status
+		window.onbeforeunload
 		//setTimeout(function () { MyUTIL.sendChat("Larry the Bot V1.0 online"); }, 3000); 
       }
 	  catch (err) { MyUTIL.logException("STARTUP.initbot: " + err.message); }
-	}
+  },
+  monitorPageChange: function() {
+    try{
+	  // Log the state data to the console
+	  window.addEventListener('popstate', function (event) { MyUTIL.logInfo(event.state);	});
+    }
+    catch (err) { MyUTIL.logException("STARTUP.monitorPageChange: " + err.message); }
+  },
+};
+
+window.onbeforeunload = function() {
+    MyUTIL.logInfo("Request to leave page: " + MyUTIL.formatDate(Date.now()));
+	return "";
 };
 
 if (!window.APIisRunning) {
