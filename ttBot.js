@@ -969,6 +969,19 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
   },
+  sendPM: function(msg, userid) { // Send chat to all
+    try {
+      //todo Delete this after we re-enable the bot kill on room change code.
+      //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
+      if (MyVARS.botMuted === true)
+        MyUTIL.logInfo(msg);
+      else if (MyVARS.runningBot)
+        MyAPI.SendPM(msg);
+      else
+        MyUTIL.logChat(msg);
+    } 
+	catch (err) { MyUTIL.logException("MyUTIL.SendPM: " + err.message); }
+  },
   bopCommand: function(cmd) {
     try {
       //TODO: menorah xmas dreidel plus many other holiday commands  (Only work if the month is 12)
@@ -1171,10 +1184,14 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
 	catch (err) { MyUTIL.logException("MyUTIL.formatDate: " + err.message); }
   },
 	  
-  formatPercentage: function(a, b) {
+  formatNumber: function(num) {
+    try			{	return (Math.round(num * 100) / 100).toFixed(2).toString();	}
+    catch (err) {	MyUTIL.logException("MyUTIL.formatNumber: " + err.message); }
+  },
+  formatPercentage: function(a, b, dec) {
     if (a === 0) return "0%";
     if (b === 0) return "100%";
-    return (((a / b).toFixed(2)) * 100).toFixed(0) + "%";
+    return (((a / b).toFixed(2 + dec)) * 100).toFixed(dec) + "%";
   },
   getDOY: function() {
     var now = new Date();
@@ -1730,7 +1747,7 @@ var MyAPI = {
 	            //This also appears to work: turntable.user.attributes.userid.toString();
 	catch (err) { MyUTIL.logException("MyAPI.CurrentUserID: " + err.message); }
   },
-  djCount: function () {
+  djCount: function () { // turntable.buddyList.room.numDjs()
 	try			{return  turntable.buddyList.room.djids.length; }
 	catch (err) { MyUTIL.logException("MyAPI.djCount: " + err.message); }
   },
@@ -1929,6 +1946,21 @@ var MyAPI = {
 			  BotEVENTS.eventChat(MyAPI.APIChat2Bot(message)); 
 			}
 			//MyUTIL.logObjects(message);
+			if (message.command === 'pmmed')  { 
+			myAPi.sendch
+			
+			}
+			/*
+command: "pmmed"
+roomobj: Object { name: "Club DeezNutzzzz", created: 1614871160.463251, shortcut: "club_deeznutzzzz", … }
+​senderid: "6047879a47c69b001bdbcd9c"
+​text: "test"
+​time: 1618234226.172688
+​userid: "604bb64b47b5e3001a8fd194"
+​
+<prototype>: Object { … }
+ttBot.js:919:21
+*/
 
 			// YOINK Message:
 			if (message.command === 'snagged')  { 
@@ -2161,6 +2193,29 @@ var MyAPI = {
 			});
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SendChat: " + err.message); }
+  },
+  //DO NOT CALL DIRECTLY, use: MyUTIL.sendChat(...
+  /*const rq = {api: 'room.speak', roomid: this.roomId, text: msg.toString()};
+  			    idAttribute: "time",
+				api: "pm.send",
+				senderid: MyAPI.CurrentUserID(),
+				receiverid: userid,
+				text: msg
+				
+var e = turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "Dude".toString()});
+turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "TEST"});
+*/
+  SendPM: function(msg, userid) { // Send pm to a user:
+    try {
+		//sendSpeakMessage
+		if (MyVARS.debugMode) console.log("CHAT: " + msg);
+		var e = turntable.sendMessage({
+			api: 'pm.send', 
+			receiverid: userid, 
+			text: msg.toString()
+			});
+    } 
+	catch (err) { MyUTIL.logException("MyAPI.SendPM: " + err.message); }
   },
   SkipSong: function() {
     try {
@@ -2541,9 +2596,9 @@ var USERS = {
   getRolledStats: function(roomUser) {
     try {
       var rollStats = " [Today: " + roomUser.rollStats.dayWoot + "/" + roomUser.rollStats.dayTotal;
-      rollStats += " " + MyUTIL.formatPercentage(roomUser.rollStats.dayWoot, roomUser.rollStats.dayTotal) + "]";
+      rollStats += " " + MyUTIL.formatPercentage(roomUser.rollStats.dayWoot, roomUser.rollStats.dayTotal, 0) + "]";
       rollStats += " [Lifetime: " + roomUser.rollStats.lifeWoot + "/" + roomUser.rollStats.lifeTotal;
-      rollStats += " " + MyUTIL.formatPercentage(roomUser.rollStats.lifeWoot, roomUser.rollStats.lifeTotal) + "]";
+      rollStats += " " + MyUTIL.formatPercentage(roomUser.rollStats.lifeWoot, roomUser.rollStats.lifeTotal, 2) + "]";
       return rollStats;
     } catch (err) {
       MyUTIL.logException("getRolledStats: " + err.message);
@@ -2588,7 +2643,7 @@ var USERS = {
           topStats.username = MyROOM.users[addUserIdx].username;
           topStats.rollCount = MyROOM.users[addUserIdx].rollStats.lifeTotal;
           topStats.winCount = MyROOM.users[addUserIdx].rollStats.lifeWoot;
-          topStats.rollPct = MyUTIL.formatPercentage(MyROOM.users[addUserIdx].rollStats.lifeWoot, MyROOM.users[addUserIdx].rollStats.lifeTotal);
+          topStats.rollPct = MyUTIL.formatPercentage(MyROOM.users[addUserIdx].rollStats.lifeWoot, MyROOM.users[addUserIdx].rollStats.lifeTotal, 2);
           leaderBoard.push(topStats);
           userIDs.push(MyROOM.users[addUserIdx].id);
         }
@@ -2636,7 +2691,7 @@ var USERS = {
           topStats.username = MyROOM.users[addUserIdx].username;
           topStats.rollCount = MyROOM.users[addUserIdx].rollStats.lifeTotal;
           topStats.winCount = MyROOM.users[addUserIdx].rollStats.lifeWoot;
-          topStats.rollPct = MyUTIL.formatPercentage(MyROOM.users[addUserIdx].rollStats.lifeWoot, MyROOM.users[addUserIdx].rollStats.lifeTotal);
+          topStats.rollPct = MyUTIL.formatPercentage(MyROOM.users[addUserIdx].rollStats.lifeWoot, MyROOM.users[addUserIdx].rollStats.lifeTotal,2);
           leaderBoard.push(topStats);
           userIDs.push(MyROOM.users[addUserIdx].id);
         }
@@ -3188,24 +3243,17 @@ var CHAT = {
     try {
       var cmd;
       //UTIL.logObject(chat, "chat");
-      //MyUTIL.logDebug("commandCheck chat: " + chat.message);
       if (chat.message.substring(0, 1) === MyVARS.commandLiteral) {
         var space = chat.message.indexOf(' ');
         if (space === -1) {
           cmd = chat.message.toLowerCase();
         } else cmd = chat.message.substring(0, space).toLowerCase();
       } else return false;
-      //MyUTIL.logDebug("commandCheck cmd: " + cmd);
-      //MyUTIL.logDebug("commandCheck chat.uid: " + chat.uid);
       var userPerm = USERS.getPermission(chat.uid);
       if (chat.message.toLowerCase() !== ".join" && chat.message.toLowerCase() !== ".in" && chat.message.toLowerCase() !== ".out" && chat.message.toLowerCase() !== ".leave" && (!MyUTIL.bopCommand(cmd))) {
-        //MyUTIL.logDebug("commandCheck1: " + cmd);
         if (userPerm === PERM.ROLE.NONE && !MyROOM.usercommand) return void(0);
-        //MyUTIL.logDebug("commandCheck2: " + cmd);
         if (!MyROOM.allcommand) return void(0);
-        //MyUTIL.logDebug("commandCheck3: " + cmd);
       }
-      //MyUTIL.logDebug("commandCheck5: " + cmd);
       var executed = false;
       for (var comm in BOTCOMMANDS) {
         var cmdCall = BOTCOMMANDS[comm].command;
@@ -3218,7 +3266,6 @@ var CHAT = {
           }
         }
       }
-      //MyUTIL.logDebug("commandCheck6: executed: " + executed);
       if (executed && userPerm === PERM.ROLE.NONE) {
         MyROOM.usercommand = false;
         setTimeout(function() {
@@ -6665,7 +6712,7 @@ var BOTCOMMANDS = {
     }
   },
   exwaitCommand: {
-    command: ['exwait', 'wait?','exwaitlist', 'waitlist?'],
+    command: ['exwait', 'wait?','exwaitlist', 'waitlist?','q?'],
     rank: 'user',
     type: 'exact',
     functionality: function(chat, cmd) {
