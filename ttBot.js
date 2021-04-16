@@ -47,7 +47,7 @@ var MyVARS = {
   botIDs: ["604bb64b47b5e3001a8fd194", "6054d87447b5e3001bd535c7"],
   botMuted: false,
   //chatLink: "https://raw.githack.com/SZigmund/basicBot/master/lang/en.json",
-  chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/8633f3be61ee23ffbf798c17688324c228ef0883/lang/en.json",
+  chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/3dda247ba1ea666d95cac4d26e4a5c04810be769/lang/en.json",
   //old chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/f4b1a9d30a7e9f022ef600dd41cae07a91797bad/lang/en.json",
   commandCooldown: 15,
   commandLiteral: ".",
@@ -7214,6 +7214,18 @@ var PERM = {
     NONE: 0
   },
 };
+
+// USAGE: XFER STORAGE SETTINGS FROM ONE PC TO ANOTHER:
+// GET Storage settings - Execute from Console:
+// JSON.stringify(MyROOM.users)
+// JSON.stringify(BAN.newBlacklist);
+// JSON.stringify(BAN.newBlacklistIDs);
+//
+// Replace all but 1st and last \" with \"
+//
+// MyROOM.users = JSON.parse(<<DATA>>);
+// BAN.newBlacklist = JSON.parse(<<DATA>>);
+// BAN.newBlacklistIDs = JSON.parse(<<DATA>>);
 
 //SECTION STORAGE: Store & Load settings/users/banlist etc.
 var STORAGE = {
