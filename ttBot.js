@@ -1,38 +1,3 @@
-// Log all skip songs, Dj Removals, skipsong
-/*
-      	  setTimeout(function() { MyUTIL.skipSong(false); }, 500);
-      	  setTimeout(function() { MyUTIL.removeDJ(bootuser.id); }, 1000);
-*/
-
-//SECTION MyCOMMENTS: All comments:
-//SECTION SETTINGS: All local settings:
-//SECTION UTIL: Core functionality: MyUTIL.
-//SECTION API: Site specific code: MyAPI. ALL Platform dependant code goes
-//SECTION BotEVENTS: Events call from host:
-//SECTION USERS: All User data
-//SECTION MyROOM: All room settings:
-//SECTION WAITLIST: Manage the waitlist:
-//SECTION AFK:
-//SECTION CHAT:
-//SECTION COMMANDS: All Bot commands - The bot commands / meat:
-//SECTION PERM: User roles/permissions
-//SECTION STORAGE: Store & Load settings/users/banlist etc.
-//SECTION STARTUP: Init code:
-
-// TESTING: DJ Waitlist ****  Issues with 
-// DONE: BotSnag grabsong
-// DONE: User split
-// DONE: SONG TOO LONG
-// DONE: SONG IN HIST
-// DONE: AFK DJ 
-// DONE: ImOut
-// DONE: Bot DJ
-
-// NEXT: THEME/GENRE  - No EDM or Kiddie songs.
-// NEXT: SONG NAME/ARTIST received :thumbsup: 2 :thumbsdown: 0 :heart: 0 
-// TODO: When a user joins the DJs, reset Lunch/Meeting breaks.
-// NEXT: SONG BAN LIST
-
 //SECTION SETTINGS: All local settings:
 var MyVARS = {
   afkResetTime: 120,		//Reset afk if dj joins queue after the afkResetTime
@@ -321,6 +286,16 @@ var MyCOMMENTS = {
     "Naw %%FU%%, I would just lay there and laugh at you.",
     "You wish %%FU%%!",
     "I heard that you are a big disappointment down there %%FU%%, so thanks, but I'll pass!!"
+  ],
+  // https://i.imgur.com/b3tSz1A.gif
+  deadHorseArray: [
+	"https://i.imgur.com/SQR12UV.gif",
+	"https://i.imgur.com/PdzhA0w.gif",
+	"https://i.imgur.com/tGLFHQ6.gif",
+	"https://i.imgur.com/FiGrrSt.gif",
+	"https://i.imgur.com/75gYeBH.gif",
+	"https://i.imgur.com/b3tSz1A.gif",
+	"https://i.imgur.com/XhwLIjY.gif"
   ],
   randomCommentArray: [
     "Okay. You people sit tight, hold the fort and keep the home fires burning. And if we're not back by dawn... call the president.",
@@ -954,6 +929,15 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.skipSong: " + err.message); }
   },
+  isImageChat: function(msg) {
+    try {
+	  if (msg.indexOf(".jpg") > -1) return true;
+	  if (msg.indexOf(".gif") > -1) return true;
+	  if (msg.indexOf(".png") > -1) return true;
+	  return false;
+    } 
+	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
+  },
   sendChat: function(msg) { // Send chat to all
     try {
       //todo Delete this after we re-enable the bot kill on room change code.
@@ -961,7 +945,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       if (MyVARS.botMuted === true)
         MyUTIL.logInfo(msg);
       else if (MyVARS.runningBot) {
-		if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me")) msg = "/me " + msg;
+		if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!MyUTIL.isImageChat(msg))) msg = "/me " + msg;
         MyAPI.SendChat(msg);
 	  }
       else
@@ -1486,11 +1470,18 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       if (chatmsg.indexOf("SCREWULARRY") > -1) fuComment = MyUTIL.fuComment();
       if (chatmsg.indexOf("SCREWYOULARRY") > -1) fuComment = MyUTIL.fuComment();
       if (fuComment.length > 0) setTimeout(function() {
-        MyUTIL.sendChat(CHAT.subChat(fuComment, {
-          fu: chat.un
-        }));
-      }, 1000);
-    } 
+        MyUTIL.sendChat(CHAT.subChat(fuComment, { fu: chat.un }));  }, 1000);
+
+	  // Misc AI comments:
+	  if (chatmsg.indexOf("QUARENTINEQUAD") > -1) setTimeout(function() { 
+		MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+	  if (chatmsg.indexOf("QUARANTINEQUAD") > -1) setTimeout(function() { 
+		MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+	  if (chatmsg.indexOf("QUARENTINEDQUAD") > -1) setTimeout(function() { 
+		MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+	  if (chatmsg.indexOf("QUARANTINEDQUAD") > -1) setTimeout(function() { 
+		MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+    }
 	catch (err) { MyUTIL.logException("MyUTIL.larryAI: " + err.message); }
   },
   // USERS.didUserDisconnect(USERS.lookupLocalUser("6054d87447b5e3001bd535c7")); // Dem  .
@@ -2217,6 +2208,10 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SendPM: " + err.message); }
   },
+  RegisterAsBot: function() { // Register this user as bot:
+    try 		{ turntable.sendMessage({"api": "user.set_bot"}); 			} 
+	catch (err) { MyUTIL.logException("MyAPI.RegisterAsBot: " + err.message);	}
+  },
   SkipSong: function() {
     try {
 		//TRY: roomManagerCallback: function(e, i) {
@@ -2302,6 +2297,7 @@ var BotEVENTS = {
     try{
 		MyAPI.MonitorSongChange();
 		MyAPI.MonitorMessages();
+		MyAPI.RegisterAsBot();
     } catch (err) { MyUTIL.logException("connectAPI: " + err.message); }
   },
   
@@ -3830,21 +3826,21 @@ var BOTCOMMANDS = {
     }
   },
 
-  commandsCommand: {
-    command: 'commands',
-    rank: 'user',
-    type: 'exact',
-    functionality: function(chat, cmd) {
-      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
-      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-      else {
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.commandslink, {
-          botname: MyVARS.loggedInName,
-          link: MyVARS.cmdLink
-        }));
-      }
-    }
-  },
+//  commandsCommand: {
+//    command: 'commands',
+//    rank: 'user',
+//    type: 'exact',
+//    functionality: function(chat, cmd) {
+//      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+//      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+//      else {
+//        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.commandslink, {
+//          botname: MyVARS.loggedInName,
+//          link: MyVARS.cmdLink
+//        }));
+//      }
+//    }
+//  },
 
   cookieCommand: {
     command: 'cookie',
@@ -4275,21 +4271,21 @@ var BOTCOMMANDS = {
     }
   },
 
-  helpCommand: {
-    command: 'help',
-    rank: 'user',
-    type: 'exact',
-    functionality: function(chat, cmd) {
-      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
-      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-      else {
-        var link = "http://i.imgur.com/SBAso1N.jpg";
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.starterhelp, {
-          link: link
-        }));
-      }
-    }
-  },
+//  helpCommand: {
+//    command: 'help',
+//    rank: 'user',
+//    type: 'exact',
+//    functionality: function(chat, cmd) {
+//      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+//      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+//      else {
+//        var link = "http://i.imgur.com/SBAso1N.jpg";
+//        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.starterhelp, {
+//          link: link
+//        }));
+//      }
+//    }
+//  },
 
   hopupCommand: {
     command: 'hopup',
@@ -7064,7 +7060,20 @@ var BOTCOMMANDS = {
 			catch(err) { MyUTIL.logException("imoutCommand: " + err.message); }
 		}
 	},
-  
+
+	deadhorseCommand: {
+		command: ['deadhorse','deadhorses'],
+		rank: 'mod',
+		type: 'startsWith',
+		functionality: function (chat, cmd)  {
+			try {
+				if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
+				if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
+				setTimeout(function() { MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+			}
+			catch(err) { MyUTIL.logException("deadhorseCommand: " + err.message); }
+		}
+	},
 	fourthirtyCommand: {
 		command: ['fourthirty','430'],
 		rank: 'mod',
