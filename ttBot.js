@@ -1,4 +1,4 @@
-//SECTION SETTINGS: All local settings:
+//SECTION SETTINGS: All local settings: 
 var MyVARS = {
   afkResetTime: 120,		//Reset afk if dj joins queue after the afkResetTime
   afk5Days: true,
@@ -16,16 +16,22 @@ var MyVARS = {
   //old chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/f4b1a9d30a7e9f022ef600dd41cae07a91797bad/lang/en.json",
   commandCooldown: 15,
   commandLiteral: ".",
+  commandLiteral2: "/",
   docID: "6047879a47c69b001bdbcd9c",
+  larryID: "604bb64b47b5e3001a8fd194",
+  testbot1ID: "6054d87447b5e3001bd535c7",
+  testbot2ID: "60782e1547b5e3001b342654",
   debugMode: false,
   enableAfkRemoval: true,
   enableBanSongCheck: true,
   enableMaxSongCheck: true,
   enableSongInHistCheck: true,
+  fbLink: "https://www.facebook.com/groups/226222424234128",
   language: "english",
   meMode: true,					// Start all comments with /me
   maximumAfk: 60,
   maximumSongLength: 8,
+  rulesLink: "https://tinyurl.com/ClubDeezRules",
   skipCooldown: false,
   songTitle: "",
   randomCommentsEnabled: true,
@@ -885,10 +891,18 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
   IsDoc: function(uid) {
 	  return (uid === MyVARS.docID);
   },
+  // All my bots
   IsBot: function(uid) {
 	if (MyVARS.botIDs.indexOf(uid) > -1) return true;
 	if (uid === MyAPI.CurrentUserID()) return true;
     return false;
+  },
+  // JUST Larry
+  IsLarry: function(uid) {
+	return (uid === MyVARS.larryID);
+  },
+  IsTestBot: function(uid) {
+	return ((uid === MyVARS.testbot1ID) || (uid === MyVARS.testbot2ID));
   },
   logObjects: function(...args) {
     try			{	console.log(...args); }
@@ -936,7 +950,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
 	  if (msg.indexOf(".png") > -1) return true;
 	  return false;
     } 
-	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
+	catch (err) { MyUTIL.logException("MyUTIL.isImageChat: " + err.message); }
   },
   sendChat: function(msg) { // Send chat to all
     try {
@@ -953,6 +967,24 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
   },
+  sendChatOrPM: function(msgType, uid, msg) { // Send chat to all
+    try {
+      //todo Delete this after we re-enable the bot kill on room change code.
+      //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
+      if (MyVARS.botMuted === true)
+        MyUTIL.logInfo(msg);
+      else if (MyVARS.runningBot && msgType == "chat") {
+		if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!MyUTIL.isImageChat(msg))) msg = "/me " + msg;
+        MyAPI.SendChat(msg);
+	  }
+      else if (MyVARS.runningBot && msgType == "pm") {
+        MyUTIL.sendPM(msg, uid);
+	  }
+      else
+        MyUTIL.logChat(msg);
+    } 
+	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
+  },
   sendPM: function(msg, userid) { // Send chat to all
     try {
       //todo Delete this after we re-enable the bot kill on room change code.
@@ -960,11 +992,11 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       if (MyVARS.botMuted === true)
         MyUTIL.logInfo(msg);
       else if (MyVARS.runningBot)
-        MyAPI.SendPM(msg);
+        MyAPI.SendPM(msg, userid);
       else
         MyUTIL.logChat(msg);
     } 
-	catch (err) { MyUTIL.logException("MyUTIL.SendPM: " + err.message); }
+	catch (err) { MyUTIL.logException("MyUTIL.sendPM: " + err.message); }
   },
   bopCommand: function(cmd) {
     try {
@@ -1580,7 +1612,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
 
 //SECTION API.: Site specific code: MyAPI. ALL Platform dependant code goes
 var MyAPI = {
-  APIChat2Bot: function(message){
+  APIChat2BotChat: function(message){
 	try {
 	  // Object { command: "speak", userid: "604bb64b47b5e3001a8fd194", name: "Larry", roomid: "60550d9447b5e3001bd53bf1", text: "Tester" }
 		CHAT.commandChat.message = message.text.trim();
@@ -1590,7 +1622,20 @@ var MyAPI = {
         CHAT.commandChat.type = "chat";
 		return CHAT.commandChat;
 	}
-	catch (err) { MyUTIL.logException("MyAPI.APIChat2Bot: " + err.message); }
+	catch (err) { MyUTIL.logException("MyAPI.APIChat2BotChat: " + err.message); }
+  },
+  APIPM2BotChat: function(message){
+	try {
+	  //OBJECT: { "text": "roll","userid": "6054d87447b5e3001bd535c7","senderid": "6047879a47c69b001bdbcd9c","command": "pmmed","time": 1619793431.713854,"roomobj": {...}
+	  CHAT.commandChat.message = message.text.trim();
+	  CHAT.commandChat.un = "";
+	  var user = USERS.lookupLocalUser(message.senderid);
+	  if (user !== false) CHAT.commandChat.un = user.username;
+	  CHAT.commandChat.uid = message.senderid.trim();
+	  CHAT.commandChat.type = "pm";
+	  return CHAT.commandChat;
+	}
+	catch (err) { MyUTIL.logException("MyAPI.APIPM2BotChat: " + err.message); }
   },
   //Convert API Song to Bot Song
   APISong2Bot:  function(song){
@@ -1934,24 +1979,12 @@ var MyAPI = {
 
 			// Object { command: "speak", userid: "604bb64b47b5e3001a8fd194", name: "Larry", roomid: "60550d9447b5e3001bd53bf1", text: "Tester" }
 			if (message.command === 'speak')  { 
-			  BotEVENTS.eventChat(MyAPI.APIChat2Bot(message)); 
+			  BotEVENTS.eventChat(MyAPI.APIChat2BotChat(message, "chat")); 
 			}
-			//MyUTIL.logObjects(message);
-			if (message.command === 'pmmed')  { 
-			myAPi.sendch
-			
+			//OBJECT: { "text": "roll","userid": "6054d87447b5e3001bd535c7","senderid": "6047879a47c69b001bdbcd9c","command": "pmmed","time": 1619793431.713854,"roomobj": {...}
+			if (message.command === 'pmmed')  {
+			  BotEVENTS.eventPM(MyAPI.APIPM2BotChat(message, "pm"));
 			}
-			/*
-command: "pmmed"
-roomobj: Object { name: "Club DeezNutzzzz", created: 1614871160.463251, shortcut: "club_deeznutzzzz", … }
-​senderid: "6047879a47c69b001bdbcd9c"
-​text: "test"
-​time: 1618234226.172688
-​userid: "604bb64b47b5e3001a8fd194"
-​
-<prototype>: Object { … }
-ttBot.js:919:21
-*/
 
 			// YOINK Message:
 			if (message.command === 'snagged')  { 
@@ -2197,13 +2230,12 @@ var e = turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdb
 turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "TEST"});
 */
   SendPM: function(msg, userid) { // Send pm to a user:
+    if (userid === MyAPI.CurrentUserID()) return; // Don't let the bot PM itsself to prevent a loop
     try {
-		//sendSpeakMessage
-		if (MyVARS.debugMode) console.log("CHAT: " + msg);
-		var e = turntable.sendMessage({
-			api: 'pm.send', 
-			receiverid: userid, 
-			text: msg.toString()
+		turntable.sendMessage({
+			"api": "pm.send", 
+			"receiverid": userid, 
+			"text": msg.toString()
 			});
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SendPM: " + err.message); }
@@ -2297,7 +2329,7 @@ var BotEVENTS = {
     try{
 		MyAPI.MonitorSongChange();
 		MyAPI.MonitorMessages();
-		MyAPI.RegisterAsBot();
+		if (MyUTIL.IsLarry(MyAPI.CurrentUserID()) ) MyAPI.RegisterAsBot();
     } catch (err) { MyUTIL.logException("connectAPI: " + err.message); }
   },
   
@@ -2353,6 +2385,17 @@ var BotEVENTS = {
       MyUTIL.larryAI(chat);
 	}
     catch (err) {	MyUTIL.logException("eventChat: " + err.message); }
+  },
+  eventPM: function(pm) {
+	try {
+	  //assume all pms are commands:
+	  if ((pm.message.substring(0, 1) !== MyVARS.commandLiteral) &&
+	      (pm.message.substring(0, 1) !== MyVARS.commandLiteral2)) pm.message = MyVARS.commandLiteral + pm.message;
+      if (CHAT.commandCheck(pm)) return;
+	  MyUTIL.sendPM("I don't understand that.", pm.uid);
+	  MyUTIL.sendPM("To join the waitlist type: .q .wait or .addme", pm.uid)
+	}
+    catch (err) {	MyUTIL.logException("eventPM: " + err.message); }
   },
 };
 
@@ -2786,7 +2829,7 @@ var USERS = {
   // Lookup local user by Username or ID:
   // USERS.lookupLocalUser("DocZ").username;
   // USERS.lookupLocalUser("demnutzzzz").username;
-  
+  // lookupuser getuser userlookup finduser
   lookupLocalUser: function(id) { //getroomuser
     try {
 	  for (var i = 0; i < MyROOM.users.length; i++) {
@@ -2992,6 +3035,7 @@ var USERS = {
         MyUTIL.logChat(MyVARS.newUserWhoisInfo);
         MyUTIL.logDebug("WelcomeBack: " + xUser.id + ": " + xUser.username);
         setTimeout(function(xUser) { MyUTIL.sendChat(welcomeMessage); }, 1 * 1000, xUser);
+		if ((!welcomeback) || (MyUTIL.IsTestBot(xUser.id))) { setTimeout(function() { MyUTIL.sendPM("Welcome to Club DeezNutzzzz. If there are no open seats to DJ, join the waitlist type: .q .wait or .addme", xUser.id)}, 500); }
       }
 	}
 	catch (err) { MyUTIL.logException("USERS.eventUserjoin: " + err.message); }
@@ -3239,6 +3283,7 @@ var CHAT = {
     try {
       var cmd;
       //UTIL.logObject(chat, "chat");
+	  if (chat.message.substring(0, 1) === MyVARS.commandLiteral2) chat.message = MyVARS.commandLiteral + chat.message.substring(1);
       if (chat.message.substring(0, 1) === MyVARS.commandLiteral) {
         var space = chat.message.indexOf(' ');
         if (space === -1) {
@@ -3420,6 +3465,10 @@ var BOTCOMMANDS = {
   //            }
   //    },
 
+/*        // OLD return MyUTIL.sendChat(msgContent);
+        return MyUTIL.sendChatOrPM(chat.type, chat.uid, msgContent);
+*/
+
   activeCommand: {
     command: 'active',
     rank: 'bouncer',
@@ -3435,7 +3484,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) time = 60;
         else {
           time = msg.substring(cmd.length + 1);
-          if (isNaN(time)) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+          if (isNaN(time)) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
             name: chat.un
           }));
         }
@@ -3445,7 +3494,7 @@ var BOTCOMMANDS = {
             chatters++;
           }
         }
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.activeusersintime, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.activeusersintime, {
           name: chat.un,
           amount: chatters,
           time: time
@@ -3463,7 +3512,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var name = msg.substr(cmd.length + 2);
@@ -3471,7 +3520,7 @@ var BOTCOMMANDS = {
         if (msg.length > cmd.length + 2) {
           if (typeof user !== 'undefined') {
             MyAPI.addDJ(user.id);
-          } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+          } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
             name: chat.un
           }));
         }
@@ -3488,17 +3537,17 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nolimitspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nolimitspecified, {
           name: chat.un
         }));
         var limit = msg.substring(cmd.length + 1);
         if (!isNaN(limit)) {
           MyVARS.maximumAfk = parseInt(limit, 10);
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.maximumafktimeset, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.maximumafktimeset, {
             name: chat.un,
             time: MyVARS.maximumAfk
           }));
-        } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidlimitspecified, {
+        } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidlimitspecified, {
           name: chat.un
         }));
       }
@@ -3515,13 +3564,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.randomRoulette) {
           MyVARS.randomRoulette = !MyVARS.randomRoulette;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': 'Random Roulette'
           }));
         } else {
           MyVARS.randomRoulette = !MyVARS.randomRoulette;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': 'Random Roulette'
           }));
@@ -3539,13 +3588,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.randomCommentsEnabled) {
           MyVARS.randomCommentsEnabled = !MyVARS.randomCommentsEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': 'Random Comments'
           }));
         } else {
           MyVARS.randomCommentsEnabled = !MyVARS.randomCommentsEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': 'Random Comments'
           }));
@@ -3564,7 +3613,7 @@ var BOTCOMMANDS = {
         if (MyVARS.enableSongInHistCheck) {
           MyVARS.enableSongInHistCheck = !MyVARS.enableSongInHistCheck;
           clearInterval(MyROOM.afkInterval);
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.repeatSongs
           }));
@@ -3573,7 +3622,7 @@ var BOTCOMMANDS = {
           MyROOM.afkInterval = setInterval(function() {
             AFK.afkCheck()
           }, 2 * 1000);
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.repeatSongs
           }));
@@ -3592,7 +3641,7 @@ var BOTCOMMANDS = {
         if (MyVARS.enableAfkRemoval) {
           MyVARS.enableAfkRemoval = !MyVARS.enableAfkRemoval;
           clearInterval(MyROOM.afkInterval);
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.afkremoval
           }));
@@ -3601,7 +3650,7 @@ var BOTCOMMANDS = {
           MyROOM.afkInterval = setInterval(function() {
 				AFK.afkCheck()
           }, 2 * 1000);
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.afkremoval
           }));
@@ -3618,11 +3667,11 @@ var BOTCOMMANDS = {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         var msg = chat.message;
-        //if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
+        //if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
         if (msg.length === cmd.length) return (0);
         var name = msg.substring(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         MyAPI.moderateBanUser(user.id, 1, MyAPI.BAN.PERMA);
@@ -3640,12 +3689,12 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var name = msg.substring(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         USERS.setLastActivity(user, false);
@@ -3666,18 +3715,18 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var name = msg.substring(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var lastActive = USERS.getLastActivity(user);
         var inactivity = Date.now() - lastActive;
         var time = MyUTIL.msToStr(inactivity);
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.inactivefor, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.inactivefor, {
           name: chat.un,
           username: name,
           time: time
@@ -3693,9 +3742,9 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat("Here are two options for auto-wooting:");
-        setTimeout(function () { MyUTIL.sendChat("1. Chrome extension - TT Plugged in: https://chrome.google.com/webstore/detail/tt-plugged-in/edoelilfhbiliocedcghdffjnbnplcfb"); }, 250);
-		setTimeout(function () { MyUTIL.sendChat("2. Izzmo's bookmark link: http://www.pinnacleofdestruction.net/tt/?fbclid=IwAR1K7W4omY01rg0m3Pz8-_wEhmDb3VavgZr9HMC__KzEwGKX-ZAr79g9z8I"); }, 500);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Here are two options for auto-wooting:");
+        setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "1. Chrome extension - TT Plugged in: https://chrome.google.com/webstore/detail/tt-plugged-in/edoelilfhbiliocedcghdffjnbnplcfb"); }, 250);
+		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "2. Izzmo's bookmark link: http://www.pinnacleofdestruction.net/tt/?fbclid=IwAR1K7W4omY01rg0m3Pz8-_wEhmDb3VavgZr9HMC__KzEwGKX-ZAr79g9z8I"); }, 500);
 
       }
     }
@@ -3709,7 +3758,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat(CHAT.chatMapping.brandambassador);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.chatMapping.brandambassador);
       }
     }
   },
@@ -3723,12 +3772,12 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var name = msg.substr(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         MyAPI.moderateBanUser(user.id, 1, MyAPI.BAN.DAY);
@@ -3749,7 +3798,7 @@ var BOTCOMMANDS = {
         var format = MyAPI.CurrentSong().format;
         var cid = MyAPI.CurrentSong().cid;
         var songid = format + ":" + cid;
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.blinfo, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.blinfo, {
           name: name,
           author: author,
           title: title,
@@ -3770,7 +3819,7 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         if (MyVARS.bouncerPlus) {
           MyVARS.bouncerPlus = false;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': 'Bouncer+'
           }));
@@ -3780,12 +3829,12 @@ var BOTCOMMANDS = {
             var perm = USERS.getPermission(id);
             if (perm > PERM.ROLE.BOUNCER) {
               MyVARS.bouncerPlus = true;
-              return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+              return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
                 name: chat.un,
                 'function': 'Bouncer+'
               }));
             }
-          } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.bouncerplusrank, {
+          } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bouncerplusrank, {
             name: chat.un
           }));
         }
@@ -3819,7 +3868,7 @@ var BOTCOMMANDS = {
         for (var i = 0; i < currentchat.length; i++) {
           MyAPI.moderateDeleteChat(currentchat[i].getAttribute("data-cid"));
         }
-        return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.chatcleared, {
+        return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.chatcleared, {
           name: chat.un
         }));
       }
@@ -3834,7 +3883,7 @@ var BOTCOMMANDS = {
 //      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
 //      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
 //      else {
-//        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.commandslink, {
+//        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.commandslink, {
 //          botname: MyVARS.loggedInName,
 //          link: MyVARS.cmdLink
 //        }));
@@ -3879,17 +3928,17 @@ var BOTCOMMANDS = {
 
         var space = msg.indexOf(' ');
         if (space === -1) {
-          MyUTIL.sendChat(CHAT.chatMapping.eatcookie);
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.chatMapping.eatcookie);
           return false;
         } else {
           var name = msg.substring(space + 2);
           var user = USERS.lookupLocalUser(name);
           if (user === false || !user.inRoom) {
-            return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nousercookie, {
+            return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nousercookie, {
               name: name
             }));
           } else if (user.username === chat.un) {
-            return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.selfcookie, {
+            return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.selfcookie, {
               name: name
             }));
           } else {
@@ -3927,13 +3976,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.cycleGuard) {
           MyVARS.cycleGuard = !MyVARS.cycleGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.cycleguard
           }));
         } else {
           MyVARS.cycleGuard = !MyVARS.cycleGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.cycleguard
           }));
@@ -3955,11 +4004,11 @@ var BOTCOMMANDS = {
         var cycleTime = msg.substring(cmd.length + 1);
         if (!isNaN(cycleTime) && cycleTime !== "") {
           MyVARS.maximumCycletime = cycleTime;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.cycleguardtime, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.cycleguardtime, {
             name: chat.un,
             time: MyVARS.maximumCycletime
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
           name: chat.un
         }));
 
@@ -3976,19 +4025,19 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length <= cmd.length + 1) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.voteskiplimit, {
+        if (msg.length <= cmd.length + 1) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.voteskiplimit, {
           name: chat.un,
           limit: MyVARS.voteSkipLimit
         }));
         var argument = msg.substring(cmd.length + 1);
         if (!MyVARS.voteSkipEnabled) MyVARS.voteSkipEnabled = !MyVARS.voteSkipEnabled;
         if (isNaN(argument)) {
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.voteskipinvalidlimit, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.voteskipinvalidlimit, {
             name: chat.un
           }));
         } else {
           MyVARS.voteSkipLimit = argument;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.voteskipsetlimit, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.voteskipsetlimit, {
             name: chat.un,
             limit: MyVARS.voteSkipLimit
           }));
@@ -4007,13 +4056,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.voteSkipEnabled) {
           MyVARS.voteSkipEnabled = !MyVARS.voteSkipEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.voteskip
           }));
         } else {
           MyVARS.voteSkipEnabled = !MyVARS.voteSkipEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.voteskip
           }));
@@ -4036,16 +4085,16 @@ var BOTCOMMANDS = {
         else {
           name = msg.substring(cmd.length + 2);
           var perm = USERS.getPermission(chat.uid);
-          if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.dclookuprank, {
+          if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.dclookuprank, {
             name: chat.un
           }));
         }
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var toChat = USERS.dclookup(user.id);
-        MyUTIL.sendChat(toChat);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, toChat);
       }
     }
   },
@@ -4059,10 +4108,10 @@ var BOTCOMMANDS = {
   //         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
   //         else {
   //             var msg = chat.message;
-  //             if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
+  //             if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
   //             var name = msg.substring(cmd.length + 2);
   //             var user = USERS.lookupLocalUser(name);
-  //             if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {name: chat.un}));
+  //             if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {name: chat.un}));
   //             var chats = $('.from');
   //             for (var i = 0; i < chats.length; i++) {
   //                 var n = chats[i].textContent;
@@ -4071,7 +4120,7 @@ var BOTCOMMANDS = {
   //                     MyAPI.moderateDeleteChat(cid);
   //                 }
   //             }
-  //             MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.deletechat, {name: chat.un, username: name}));
+  //             MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.deletechat, {name: chat.un, username: name}));
   //         }
   //     }
   // },
@@ -4085,7 +4134,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var link = 'http://www.emoji-cheat-sheet.com/';
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.emojilist, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.emojilist, {
           link: link
         }));
       }
@@ -4108,17 +4157,17 @@ var BOTCOMMANDS = {
           name = msg.substring(cmd.length + 2);
         } else name = chat.un;
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var pos = MyAPI.getDjListPosition(user.id);
-        if (pos < 0) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notinwaitlist, {
+        if (pos < 0) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notinwaitlist, {
           name: name
         }));
         var timeRemaining = MyAPI.getTimeRemaining();
         var estimateMS = ((pos * 4 * 60) + timeRemaining) * 1000;
         var estimateString = MyUTIL.msToStr(estimateMS);
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.eta, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.eta, {
           name: name,
           time: estimateString
         }));
@@ -4135,7 +4184,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (typeof MyVARS.fbLink === "string")
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.facebook, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.facebook, {
             link: MyVARS.fbLink
           }));
       }
@@ -4152,13 +4201,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.filterChat) {
           MyVARS.filterChat = !MyVARS.filterChat;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.chatfilter
           }));
         } else {
           MyVARS.filterChat = !MyVARS.filterChat;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.chatfilter
           }));
@@ -4183,11 +4232,11 @@ var BOTCOMMANDS = {
         }
         var user = USERS.lookupLocalUser(name);
         if (user === false || !user.inRoom) {
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.ghosting, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.ghosting, {
             name1: chat.un,
             name2: name
           }));
-        } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notghosting, {
+        } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notghosting, {
           name1: chat.un,
           name2: name
         }));
@@ -4227,13 +4276,13 @@ var BOTCOMMANDS = {
           var commatag = tag.replace(/ /g, ", ");
           get_id(api_key, tag, function(id) {
             if (typeof id !== 'undefined') {
-              MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.validgiftags, {
+              MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.validgiftags, {
                 name: chat.un,
                 id: id,
                 tags: commatag
               }));
             } else {
-              MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidgiftags, {
+              MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidgiftags, {
                 name: chat.un,
                 tags: commatag
               }));
@@ -4256,12 +4305,12 @@ var BOTCOMMANDS = {
           var rating = "pg-13"; // PG 13 gifs
           get_random_id(api_key, function(id) {
             if (typeof id !== 'undefined') {
-              MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.validgifrandom, {
+              MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.validgifrandom, {
                 name: chat.un,
                 id: id
               }));
             } else {
-              MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidgifrandom, {
+              MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidgifrandom, {
                 name: chat.un
               }));
             }
@@ -4280,7 +4329,7 @@ var BOTCOMMANDS = {
 //      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
 //      else {
 //        var link = "http://i.imgur.com/SBAso1N.jpg";
-//        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.starterhelp, {
+//        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.starterhelp, {
 //          link: link
 //        }));
 //      }
@@ -4329,18 +4378,18 @@ var BOTCOMMANDS = {
       else {
         name = msg.substring(cmd.length + 2);
         var perm = USERS.getPermission(chat.uid);
-        if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.bootrank, {
+        if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bootrank, {
           name: chat.un
         }));
         byusername = " [ executed by " + chat.un + " ]";
       }
       var user = USERS.lookupLocalUser(name); 
-      if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+      if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
         name: chat.un
       }));
       if (user.bootable) {
         user.bootable = false;
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.bootableDisabled, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bootableDisabled, {
           name: name,
           userbyname: byusername
         }));
@@ -4382,18 +4431,18 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var name = msg.substring(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var join = USERS.getJointime(user);
         var time = Date.now() - join;
         var timeString = MyUTIL.msToStr(time);
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.jointime, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.jointime, {
           namefrom: chat.un,
           username: name,
           time: timeString
@@ -4424,7 +4473,7 @@ var BOTCOMMANDS = {
 
         var user = USERS.lookupLocalUser(name);
         var from = chat.un;
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
 
@@ -4432,7 +4481,7 @@ var BOTCOMMANDS = {
         var permTokick = USERS.getPermission(user.id);
 
         if (permFrom <= permTokick)
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.kickrank, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.kickrank, {
             name: chat.un
           }));
 
@@ -4448,7 +4497,7 @@ var BOTCOMMANDS = {
             MyAPI.moderateUnbanUser(id);
             //MyUTIL.logDebug('Unbanned @' + name + '. (' + id + ')');
           }, time * 60 * 1000, user.id, name);
-        } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+        } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
           name: chat.un
         }));
       }
@@ -4509,14 +4558,14 @@ var BOTCOMMANDS = {
         if (perm >= PERM.ROLE.DJ || isDj) {
           if (media.format === 1) {
             var linkToSong = "https://www.youtube.com/watch?v=" + media.cid;
-            MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.songlink, {
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.songlink, {
               name: from,
               link: linkToSong
             }));
           }
           if (media.format === 2) {
             SC.get('/tracks/' + media.cid, function(sound) {
-              MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.songlink, {
+              MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.songlink, {
                 name: from,
                 link: sound.permalink_url
               }));
@@ -4551,11 +4600,11 @@ var BOTCOMMANDS = {
         var temp = MyVARS.lockdownEnabled;
         MyVARS.lockdownEnabled = !temp;
         if (MyVARS.lockdownEnabled) {
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.lockdown
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
           name: chat.un,
           'function': CHAT.chatMapping.lockdown
         }));
@@ -4573,13 +4622,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.lockGuard) {
           MyVARS.lockGuard = !MyVARS.lockGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.lockdown
           }));
         } else {
           MyVARS.lockGuard = !MyVARS.lockGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.lockguard
           }));
@@ -4603,7 +4652,7 @@ var BOTCOMMANDS = {
 		  MyROOM.queueable = false;
 
 		  if (chat.message.length === cmd.length) {
-			MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.usedlockskip, {
+			MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.usedlockskip, {
 			  name: chat.un
 			}));
 			MyUTIL.booth.lockBooth();
@@ -4631,14 +4680,14 @@ var BOTCOMMANDS = {
 			}
 		  }
 		  if (validReason) {
-			MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.usedlockskip, {
+			MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.usedlockskip, {
 			  name: chat.un
 			}));
 			MyUTIL.booth.lockBooth();
 			setTimeout(function(id) {
 			  MyUTIL.logInfo("Skip song: " + MyAPI.CurrentSong().title + " by: " + chat.un + " Reason: Lockskip command");
 			  MyUTIL.skipSong(true, "Lock-Skip2");
-			  MyUTIL.sendChat(msgSend);
+			  MyUTIL.sendChatOrPM(chat.type, chat.uid, msgSend);
 			  setTimeout(function(id) {
 				USERS.moveUser(id, MyVARS.lockskipPosition, false);
 				MyROOM.queueable = true;
@@ -4665,11 +4714,11 @@ var BOTCOMMANDS = {
         var pos = msg.substring(cmd.length + 1);
         if (!isNaN(pos)) {
           MyVARS.lockskipPosition = pos;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.lockskippos, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.lockskippos, {
             name: chat.un,
             position: MyVARS.lockskipPosition
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidpositionspecified, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidpositionspecified, {
           name: chat.un
         }));
       }
@@ -4688,11 +4737,11 @@ var BOTCOMMANDS = {
         var lockTime = msg.substring(cmd.length + 1);
         if (!isNaN(lockTime) && lockTime !== "") {
           MyVARS.maximumLocktime = lockTime;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.lockguardtime, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.lockguardtime, {
             name: chat.un,
             time: MyVARS.maximumLocktime
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
           name: chat.un
         }));
       }
@@ -4711,11 +4760,11 @@ var BOTCOMMANDS = {
         var maxTime = msg.substring(cmd.length + 1);
         if (!isNaN(maxTime)) {
           MyVARS.repeatSongTime = maxTime;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.repeatSongLimit, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.repeatSongLimit, {
             name: chat.un,
             time: MyVARS.repeatSongTime
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
           name: chat.un
         }));
       }
@@ -4729,7 +4778,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.logout, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.logout, {
           name: chat.un,
           botname: MyVARS.loggedInName
         }));
@@ -4750,7 +4799,7 @@ var BOTCOMMANDS = {
   //         else {
   //             $(".icon-site-logo").click();
   //             setTimeout(function (chat) {
-  //                 MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.logout, {name: chat.un, botname: MyVARS.loggedInName}));
+  //                 MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.logout, {name: chat.un, botname: MyVARS.loggedInName}));
   //                 setTimeout(function () {
   //                     $(".icon-logout-grey").click();
   //                 }, 1000);
@@ -4783,7 +4832,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length <= cmd.length + 1) return MyUTIL.sendChat('/me MotD: ' + MyVARS.motd);
+        if (msg.length <= cmd.length + 1) return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me MotD: ' + MyVARS.motd);
         var argument = msg.substring(cmd.length + 1);
         if (!MyVARS.motdEnabled) MyVARS.motdEnabled = !MyVARS.motdEnabled;
         if (isNaN(argument)) {
@@ -4810,7 +4859,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var firstSpace = msg.indexOf(' ');
@@ -4825,7 +4874,7 @@ var BOTCOMMANDS = {
           name = msg.substring(cmd.length + 2, lastSpace);
         }
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         if (user.id === MyAPI.CurrentUserID()) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.addbotwaitlist, {
@@ -4836,7 +4885,7 @@ var BOTCOMMANDS = {
             name: chat.un
           }));
           USERS.moveUser(user.id, pos, false);
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidpositionspecified, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidpositionspecified, {
           name: chat.un
         }));
       }
@@ -4852,7 +4901,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var lastSpace = msg.lastIndexOf(' ');
@@ -4864,7 +4913,7 @@ var BOTCOMMANDS = {
         } else {
           time = msg.substring(lastSpace + 1);
           if (isNaN(time) || time == "" || time == null || typeof time == "undefined") {
-            return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invalidtime, {
+            return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invalidtime, {
               name: chat.un
             }));
           }
@@ -4872,7 +4921,7 @@ var BOTCOMMANDS = {
         }
         var from = chat.un;
         var user = USERS.lookupLocalUser(name);
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var permFrom = USERS.getPermission(chat.uid);
@@ -4952,21 +5001,6 @@ var BOTCOMMANDS = {
     }
   },
 
-  opCommand: {
-    command: 'op',
-    rank: 'user',
-    type: 'exact',
-    functionality: function(chat, cmd) {
-      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
-      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-      else {
-        if (typeof MyVARS.opLink === "string")
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.oplist, {
-            link: MyVARS.opLink
-          }));
-      }
-    }
-  },
 
   pingCommand: {
     command: 'ping',
@@ -4976,7 +5010,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat(CHAT.chatMapping.pong)
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.chatMapping.pong)
       }
     }
   },
@@ -4989,8 +5023,8 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        //MyUTIL.sendChat("I know @WhiteWidow is singing along with this hypster track");
-        MyUTIL.sendChat("@WhiteWidow is so un-hipster she's basically normcore.");
+        //MyUTIL.sendChatOrPM(chat.type, chat.uid, "I know @WhiteWidow is singing along with this hypster track");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "@WhiteWidow is so un-hipster she's basically normcore.");
       }
     }
   },
@@ -5014,7 +5048,7 @@ var BOTCOMMANDS = {
 
   reloadCommand: {
     command: 'reload',
-    rank: 'bouncer',
+    rank: 'cohost',
     type: 'exact',
     functionality: function(chat, cmd) {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
@@ -5033,7 +5067,7 @@ var BOTCOMMANDS = {
 
   reloadtestCommand: {
     command: 'reloadtest',
-    rank: 'bouncer',
+    rank: 'cohost',
     type: 'exact',
     functionality: function(chat, cmd) {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
@@ -5070,12 +5104,12 @@ var BOTCOMMANDS = {
               MyUTIL.skipSong(true, "Remove Command");
               setTimeout(function() { MyUTIL.removeDJ(user.id, "Remove command1"); }, 1 * 1000, user);
             } else MyUTIL.removeDJ(user.id, "Remove command2");
-          } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.removenotinwl, {
+          } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.removenotinwl, {
             name: chat.un,
             username: name
           }));
         } 
-		else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, { name: chat.un }));
+		else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, { name: chat.un }));
       }
     }
   },
@@ -5090,13 +5124,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.etaRestriction) {
           MyVARS.etaRestriction = !MyVARS.etaRestriction;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.etarestriction
           }));
         } else {
           MyVARS.etaRestriction = !MyVARS.etaRestriction;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.etarestriction
           }));
@@ -5111,10 +5145,10 @@ var BOTCOMMANDS = {
     functionality: function(chat, cmd) {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-	  MyUTIL.sendChat("https://f3cherokee.com/wp-content/uploads/2020/08/do-you-want-to-play-a-game.jpg");
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://f3cherokee.com/wp-content/uploads/2020/08/do-you-want-to-play-a-game.jpg");
       // if (MyROOM.roulette.rouletteStatus) return void(0);
       // if (MyUTIL.rouletteTimeRange()) {
-        // MyUTIL.sendChat("The LAW runs the Roulette weekdays 9AM-5PM EST");
+        // MyUTIL.sendChatOrPM(chat.type, chat.uid, "The LAW runs the Roulette weekdays 9AM-5PM EST");
         // return void(0);
       // }
       // MyROOM.roulette.startRoulette();
@@ -5130,7 +5164,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (typeof MyVARS.rulesLink === "string")
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.roomrules, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.roomrules, {
             link: MyVARS.rulesLink
           }));
       }
@@ -5149,7 +5183,7 @@ var BOTCOMMANDS = {
         var woots = MyROOM.roomstats.totalWoots;
         var mehs = MyROOM.roomstats.totalMehs;
         var grabs = MyROOM.roomstats.totalCurates;
-        MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.sessionstats, {
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.sessionstats, {
           name: from,
           woots: woots,
           mehs: mehs,
@@ -5164,7 +5198,7 @@ var BOTCOMMANDS = {
     rank: 'bouncer',
     type: 'exact',
     functionality: function(chat, cmd) {
-      if (!MyUTIL.canSkip()) return MyUTIL.sendChat("Skip too soon...");
+      if (!MyUTIL.canSkip()) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Skip too soon...");
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
@@ -5179,7 +5213,7 @@ var BOTCOMMANDS = {
     rank: 'bouncer',
     type: 'exact',
     functionality: function(chat, cmd) {
-      if (!MyUTIL.canSkip()) return MyUTIL.sendChat("Skip too soon...");
+      if (!MyUTIL.canSkip()) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Skip too soon...");
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
@@ -5219,19 +5253,19 @@ var BOTCOMMANDS = {
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
 
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat("Missing mid to remove...");
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Missing mid to remove...");
         var midToRemove = msg.substring(cmd.length + 1);
         MyUTIL.logDebug("Keyword: " + midToRemove);
         var idxToRemove = MyROOM.newBlacklistIDs.indexOf(midToRemove);
-        if (idxToRemove < 0) return MyUTIL.sendChat("Could not locate mid: " + midToRemove);
-        if (MyROOM.newBlacklist.length !== MyROOM.newBlacklistIDs.length) return MyUTIL.sendChat("Could not remove song ban, corrupt song list info.");
+        if (idxToRemove < 0) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Could not locate mid: " + midToRemove);
+        if (MyROOM.newBlacklist.length !== MyROOM.newBlacklistIDs.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Could not remove song ban, corrupt song list info.");
         var track = MyROOM.newBlacklist[idxToRemove];
         var msgToSend = chat.un + " removed [" + track.author + " - " + track.title + "] from the banned song list.";
         MyROOM.newBlacklist.splice(idxToRemove, 1); // Remove 1 item from list
         MyROOM.newBlacklistIDs.splice(idxToRemove, 1); // Remove 1 item from list
         if (MyROOM.blacklistLoaded) localStorage["BLACKLIST"] = JSON.stringify(MyROOM.newBlacklist);
         if (MyROOM.blacklistLoaded) localStorage["BLACKLISTIDS"] = JSON.stringify(MyROOM.newBlacklistIDs);
-        MyUTIL.sendChat(msgToSend);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, msgToSend);
         MyUTIL.logInfo(msgToSend);
       } catch (err) {
         MyUTIL.logException("banremove: " + err.message);
@@ -5246,7 +5280,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        if (MyROOM.newBlacklist.length !== MyROOM.newBlacklistIDs.length) MyUTIL.sendChat("Could not remove song ban, corrupt song list info.");
+        if (MyROOM.newBlacklist.length !== MyROOM.newBlacklistIDs.length) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Could not remove song ban, corrupt song list info.");
         MyROOM.newBlacklist.splice(0, MyROOM.newBlacklist.length); // Remove all items from list
         MyROOM.newBlacklistIDs.splice(0, MyROOM.newBlacklistIDs.length); // Remove all items from list
         if (MyROOM.blacklistLoaded) localStorage["BLACKLIST"] = JSON.stringify(MyROOM.newBlacklist);
@@ -5301,17 +5335,17 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         if (msg.length > cmd.length) histIndex = msg.substring(cmd.length + 1);
         if (isNaN(histIndex)) {
-          MyUTIL.sendChat("Invalid historical song index number");
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, "Invalid historical song index number");
           return;
         }
         var songHistory = MyAPI.getHistory();
         if ((parseInt(histIndex) > songHistory.length) || (parseInt(histIndex) < 1)) {
-          MyUTIL.sendChat("Invalid historical song index value");
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, "Invalid historical song index value");
           return;
         }
         var song = songHistory[parseInt(histIndex) - 1];
         if (typeof song === 'undefined') {
-          MyUTIL.sendChat("Could not define song idx: " + histIndex);
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, "Could not define song idx: " + histIndex);
           return;
         }
         var songMid = song.media.format + ':' + song.media.cid;
@@ -5512,7 +5546,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("I've got " + MyROOM.newBlacklist.length + " songs on the ban list " + chat.un + ".");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "I've got " + MyROOM.newBlacklist.length + " songs on the ban list " + chat.un + ".");
       } catch (err) {
         MyUTIL.logException("banlistcount: " + err.message);
       }
@@ -5551,36 +5585,36 @@ var BOTCOMMANDS = {
         if (!privatemsg) {
           var msgtoSend = "Found " + matchCnt + " matches.";
           if (matchCnt > 10) msgtoSend += "(only display first 10)"
-          MyUTIL.sendChat(msgtoSend);
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, msgtoSend);
           if (matchCnt > 0) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[0]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[0]);
           }, 1 * 500);
           if (matchCnt > 1) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[1]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[1]);
           }, 2 * 500);
           if (matchCnt > 2) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[2]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[2]);
           }, 3 * 500);
           if (matchCnt > 3) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[3]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[3]);
           }, 4 * 500);
           if (matchCnt > 4) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[4]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[4]);
           }, 5 * 500);
           if (matchCnt > 5) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[5]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[5]);
           }, 6 * 500);
           if (matchCnt > 6) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[6]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[6]);
           }, 7 * 500);
           if (matchCnt > 7) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[7]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[7]);
           }, 8 * 500);
           if (matchCnt > 8) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[8]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[8]);
           }, 9 * 500);
           if (matchCnt > 9) setTimeout(function() {
-            MyUTIL.sendChat(dispMsgs[9]);
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, dispMsgs[9]);
           }, 10 * 500);
         }
       } catch (err) {
@@ -5594,7 +5628,7 @@ var BOTCOMMANDS = {
     type: 'exact',
     functionality: function(chat, cmd) {
       try {
-        if (!MyUTIL.canSkip()) return MyUTIL.sendChat("Skip too soon...");
+        if (!MyUTIL.canSkip()) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Skip too soon...");
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         MyUTIL.banCurrentSong(chat.un);
@@ -5628,13 +5662,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.songstats) {
           MyVARS.songstats = !MyVARS.songstats;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.songstats
           }));
         } else {
           MyVARS.songstats = !MyVARS.songstats;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.songstats
           }));
@@ -5651,7 +5685,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat('/me This bot was made by ' + MyVARS.botCreator + '.');
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me This bot was made by ' + MyVARS.botCreator + '.');
       }
     }
   },
@@ -5731,9 +5765,9 @@ var BOTCOMMANDS = {
         });
 
         setTimeout(function() {
-          MyUTIL.sendChat(msg2);
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, msg2);
         }, 500);
-        return MyUTIL.sendChat(msg);
+        return MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
       }
     }
   },
@@ -5747,7 +5781,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         var msg = chat.message;
-        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+        if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
         var firstSpace = msg.indexOf(' ');
@@ -5795,7 +5829,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (typeof MyVARS.themeLink === "string")
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.genres, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.genres, {
             link: MyVARS.themeLink
           }));
       }
@@ -5812,13 +5846,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.timeGuard) {
           MyVARS.timeGuard = !MyVARS.timeGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.timeguard
           }));
         } else {
           MyVARS.timeGuard = !MyVARS.timeGuard;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.timeguard
           }));
@@ -5839,11 +5873,11 @@ var BOTCOMMANDS = {
         var temp = MyVARS.blacklistEnabled;
         MyVARS.blacklistEnabled = !temp;
         if (MyVARS.blacklistEnabled) {
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.blacklist
           }));
-        } else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+        } else return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
           name: chat.un,
           'function': CHAT.chatMapping.blacklist
         }));
@@ -5861,13 +5895,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.motdEnabled) {
           MyVARS.motdEnabled = !MyVARS.motdEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.motd
           }));
         } else {
           MyVARS.motdEnabled = !MyVARS.motdEnabled;
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.motd
           }));
@@ -5902,7 +5936,7 @@ var BOTCOMMANDS = {
           }
           if (!found) {
             $(".icon-chat").click();
-            return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notbanned, {
+            return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notbanned, {
               name: chat.un
             }));
           }
@@ -5951,7 +5985,7 @@ var BOTCOMMANDS = {
 
         var user = USERS.lookupLocalUser(name);
 
-        if (typeof user === 'boolean') return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
 
@@ -5976,11 +6010,11 @@ var BOTCOMMANDS = {
               username: name
             }));
           } catch (err) {
-            MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notmuted, {
+            MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notmuted, {
               name: chat.un
             }));
           }
-        } else MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.unmuterank, {
+        } else MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.unmuterank, {
           name: chat.un
         }));
       }
@@ -6019,13 +6053,13 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (MyVARS.usercommandsEnabled) {
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.usercommands
           }));
           MyVARS.usercommandsEnabled = !MyVARS.usercommandsEnabled;
         } else {
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.usercommands
           }));
@@ -6048,7 +6082,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) name = chat.un
         else name = msg.substring(cmd.length + 2);
         var user = USERS.lookupLocalUser(name);
-        if (user === false) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
+        if (user === false) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
         }));
         var msg = CHAT.subChat(CHAT.chatMapping.mystats, {
@@ -6063,7 +6097,7 @@ var BOTCOMMANDS = {
         msg += " Roll Stats: " + USERS.getRolledStats(user);
         var byusername = " [ executed by " + chat.un + " ]";
         if (chat.un !== name) msg += byusername;
-        MyUTIL.sendChat(msg);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
       } catch (err) {
         MyUTIL.logException("mystatsCommand: " + err.message);
       }
@@ -6112,13 +6146,13 @@ var BOTCOMMANDS = {
       else {
         if (MyVARS.welcome) {
           MyVARS.welcome = !MyVARS.welcome;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleoff, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleoff, {
             name: chat.un,
             'function': CHAT.chatMapping.welcomemsg
           }));
         } else {
           MyVARS.welcome = !MyVARS.welcome;
-          return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.toggleon, {
+          return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.toggleon, {
             name: chat.un,
             'function': CHAT.chatMapping.welcomemsg
           }));
@@ -6132,7 +6166,7 @@ var BOTCOMMANDS = {
     rank: 'mod',
     type: 'exact',
     functionality: function(chat, cmd) {
-      MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.online, {
+      MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.online, {
         botname: MyVARS.loggedInName,
         version: MyVARS.version
       }));
@@ -6156,7 +6190,8 @@ var BOTCOMMANDS = {
         var msgContent = msg.substring(cmd.length + 1);
         msgContent = msgContent.replace(/&#39;/g, "'");
         MyUTIL.logInfo(chat.un + " used echo: " + msgContent);
-        return MyUTIL.sendChat(msgContent);
+        // OLD return MyUTIL.sendChat(msgContent);
+        return MyUTIL.sendChatOrPM(chat.type, chat.uid, msgContent);
       } catch (err) {
         MyUTIL.logException("echoCommand: " + err.message);
       }
@@ -6185,7 +6220,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        return MyUTIL.sendChat(MyUTIL.randomCommentSelect());
+        return MyUTIL.sendChatOrPM(chat.type, chat.uid, MyUTIL.randomCommentSelect());
       } catch (err) {
         MyUTIL.logException("speakCommand: " + err.message);
       }
@@ -6200,7 +6235,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (typeof MyVARS.website === "string")
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.website, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.website, {
             link: MyVARS.website
           }));
       }
@@ -6227,7 +6262,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat(CHAT.chatMapping.origem);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.chatMapping.origem);
       }
     }
   },
@@ -6252,10 +6287,10 @@ var BOTCOMMANDS = {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         else {
-          if (chat.message.length === cmd.length) return MyUTIL.sendChat('/me No user specified.');
+          if (chat.message.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me No user specified.');
           var name = chat.message.substring(cmd.length + 2);
           var roomUser = USERS.lookupLocalUser(name);
-          if (typeof roomUser === 'boolean') return MyUTIL.sendChat('/me Invalid user specified.');
+          if (typeof roomUser === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me Invalid user specified.');
           var lang = MyAPI.getChatRoomUser(roomUser.id).language;
           MyUTIL.logDebug("lang: " + lang);
           MyUTIL.logDebug("roomUser: " + roomUser.username);
@@ -6307,8 +6342,8 @@ var BOTCOMMANDS = {
 		  looper++;
 		  removeCnt++;
 		}
-		if (removeCnt === 0)return MyUTIL.sendChat("/me " + chat.un + " you are not on the waitlist");
-		return MyUTIL.sendChat("/me " + chat.un + " you have been removed from the waitlist");
+		if (removeCnt === 0)return MyUTIL.sendChatOrPM(chat.type, chat.uid, "/me " + chat.un + " you are not on the waitlist");
+		return MyUTIL.sendChatOrPM(chat.type, chat.uid, "/me " + chat.un + " you have been removed from the waitlist");
       } 
 	  catch (err) { MyUTIL.logException("removemeCommand: " + err.message); }
     }
@@ -6319,10 +6354,10 @@ var BOTCOMMANDS = {
     type: 'startsWith',
     functionality: function(chat, cmd) {
       try {
-		if (MyROOM.queue.id.length === 0) return MyUTIL.sendChat("/me No current waitlist. Type .addme to join the wailist.");
+		if (MyROOM.queue.id.length === 0) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "/me No current waitlist. Type .q .wait or .addme to join the wailist.");
 		var idx = 1;
 		MyROOM.queue.id.forEach(uid => {
-		  MyUTIL.sendChat("/me " + idx + ": " + USERS.lookupLocalUser(uid).username);
+		  MyUTIL.sendChatOrPM(chat.type, chat.uid, " " + idx + ": " + USERS.lookupLocalUser(uid).username);
 		  idx++; });
       } 
 	  catch (err) { MyUTIL.logException("waitlistCommand: " + err.message); }
@@ -6336,11 +6371,11 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       var msg = chat.message;
-      if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
+      if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
         name: chat.un
       }));
       var bootid = msg.substr(cmd.length + 1);
-      if (isNaN(bootid)) return MyUTIL.sendChat("Invalid ID");
+      if (isNaN(bootid)) return MyUTIL.sendChatOrPM(chat.type, chat.uid, "Invalid ID");
       MyUTIL.logInfo("Boot ID: " + bootid);
       MyAPI.moderateBanUser(bootid, 1, MyAPI.BAN.PERMA);
     }
@@ -6397,10 +6432,10 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        if (MyAPI.CurrentDJID() !== chat.uid) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notcurrentdj, {
+        if (MyAPI.CurrentDJID() !== chat.uid) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notcurrentdj, {
           name: chat.un
         }));
-        if (USERS.getRolled(chat.un)) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.doubleroll, {
+        if (USERS.getRolled(chat.un)) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.doubleroll, {
           name: chat.un
         }));
         var msg = chat.message;
@@ -6455,13 +6490,13 @@ var BOTCOMMANDS = {
           name = msg.substring(cmd.length + 2);
           var perm = USERS.getPermission(chat.uid);
           if (perm < PERM.ROLE.BOUNCER) 
-		    return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.bootrank, { name: chat.un }));
+		    return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bootrank, { name: chat.un }));
           byusername = " [ executed by " + chat.un + " ]";
         }
         var user = USERS.lookupLocalUser(name);
         var currPos = MyAPI.getDjListPosition(user.id) + 1;
         if (currPos < 1) 
-		  return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.notinwaitlist, { name: name }));
+		  return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.notinwaitlist, { name: name }));
         user.lastKnownPosition = currPos;
         user.lastSeenInLine = Date.now();
         USERS.updateDC(user);
@@ -6571,7 +6606,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat(MyROOM.songinfo.songStatsMsg);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, MyROOM.songinfo.songStatsMsg);
       } catch (err) {
         MyUTIL.logException("lastplayed: " + err.message);
       }
@@ -6585,7 +6620,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Explain ROULETTE: Managers type .roulette to start the game.  Type .join to join the game. The winner gets moved to a random place in line. It is a Russian roulette in that the new position is random. So, when you win you may get moved back in line.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain ROULETTE: Managers type .roulette to start the game.  Type .join to join the game. The winner gets moved to a random place in line. It is a Russian roulette in that the new position is random. So, when you win you may get moved back in line.");
       } catch (err) {
         MyUTIL.logException("exroulettecommand: " + err.message);
       }
@@ -6599,7 +6634,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Explain TASTY POINTS: This is another way to let your fellow DJs know you enjoy their play.  Since most of us run auto-woot extentions it is just a nice way to let others know when they play an extra tasty selection.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain TASTY POINTS: This is another way to let your fellow DJs know you enjoy their play.  Since most of us run auto-woot extentions it is just a nice way to let others know when they play an extra tasty selection.");
       } catch (err) {
         MyUTIL.logException("extastycommand: " + err.message);
       }
@@ -6613,7 +6648,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Explain MEETING: If you have to go afk type, .meeting or .lunch and Larry will remove you from line. When you return hop back in line and Larry will restore your position in line. If you leave the room for over 10 mins you'll lose your spot.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain MEETING: If you have to go afk type, .meeting or .lunch and Larry will remove you from line. When you return hop back in line and Larry will restore your position in line. If you leave the room for over 10 mins you'll lose your spot.");
       } catch (err) {
         MyUTIL.logException("exmeeting: " + err.message);
       }
@@ -6627,10 +6662,10 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        if (chat.message.length === cmd.length) return MyUTIL.sendChat('/me No user specified.');
+        if (chat.message.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me No user specified.');
         var name = chat.message.substring(cmd.length + 2);
         var roomUser = USERS.lookupLocalUser(name);
-        if (typeof roomUser === 'boolean') return MyUTIL.sendChat('/me Invalid user specified.');
+        if (typeof roomUser === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Invalid user specified.');
         var msgSend = "@" + roomUser.username + ": If you find yourself Meh-ing most songs, this isn't the room for you. Serial Meh'ers will be banned. If you don't like the music find a different room please.";
         MyUTIL.sendChat(msgSend);
       } catch (err) {
@@ -6647,23 +6682,9 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Auto-Roll feature enabled for: " + chat.un);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Auto-Roll feature enabled for: " + chat.un);
       } catch (err) {
         MyUTIL.logException("autoroll: " + err.message);
-      }
-    }
-  },
-  exrefreshCommand: {
-    command: ['exrefresh', 'refresh?'],
-    rank: 'resident-dj',
-    type: 'exact',
-    functionality: function(chat, cmd) {
-      try {
-        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
-        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Hover over the video area and press the refresh button.  Press it repeatedly until a window pops up and lets you select an alternate song.");
-      } catch (err) {
-        MyUTIL.logException("exrefresh: " + err.message);
       }
     }
   },
@@ -6675,7 +6696,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("You're only getting woots cause we all have auto woot");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "You're only getting woots cause we all have auto woot");
       } catch (err) {
         MyUTIL.logException("whycommand: " + err.message);
       }
@@ -6689,7 +6710,7 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        MyUTIL.sendChat("@WhiteWidow loves the bass line.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "@WhiteWidow loves the bass line.");
       }
     }
   },
@@ -6701,7 +6722,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("You know your play sucks when the chat goes quiet");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "You know your play sucks when the chat goes quiet");
       } catch (err) {
         MyUTIL.logException("ughcommand: " + err.message);
       }
@@ -6715,9 +6736,9 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Explain WAITLIST: To join the waitlist type: .wait or .addme");
-		setTimeout(function () { MyUTIL.sendChat("DJs removed to allow others on the waitlist to play a song, will automatically be added to the waitlist."); }, 500);
-		setTimeout(function () { MyUTIL.sendChat("To be removed from the waitlist type: .removeme"); }, 1000);
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain WAITLIST: To join the waitlist type: .q .wait or .addme");
+		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "DJs removed to allow others on the waitlist to play a song, will automatically be added to the waitlist."); }, 500);
+		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "To be removed from the waitlist type: .removeme"); }, 1000);
 	  } 		
 	  catch (err) { MyUTIL.logException("exrollcommand: " + err.message); }
     }
@@ -6730,7 +6751,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("Explain ROLL: A dj can roll the dice during their spin. Rolling 1-3=MEH, 4-6=WOOT. 50% chance. type .roll during your spin to do it.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain ROLL: A dj can roll the dice during their spin. Rolling 1-3=MEH, 4-6=WOOT. 50% chance. type .roll during your spin to do it.");
       } catch (err) {
         MyUTIL.logException("exrollcommand: " + err.message);
       }
@@ -6744,7 +6765,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChat("/me gives " + chat.un + " a big fat :kiss:");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "gives " + chat.un + " a big fat :kiss:");
       } catch (err) {
         MyUTIL.logException("exkisscommand: " + err.message);
       }
@@ -7069,7 +7090,7 @@ var BOTCOMMANDS = {
 			try {
 				if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
 				if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
-				setTimeout(function() { MyUTIL.sendChat(MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
+				setTimeout(function() { MyUTIL.sendChatOrPM(chat.type, chat.uid, MyUTIL.selectRandomFromArray(MyCOMMENTS.deadHorseArray));  }, 250);
 			}
 			catch(err) { MyUTIL.logException("deadhorseCommand: " + err.message); }
 		}
@@ -7082,7 +7103,7 @@ var BOTCOMMANDS = {
 			try {
 				if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
 				if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
-				 setTimeout(function () { MyUTIL.sendChat("https://media.giphy.com/media/11QJgcchgwskq4/giphy.gif"); }, 250);
+				 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://media.giphy.com/media/11QJgcchgwskq4/giphy.gif"); }, 250);
 			}
 			catch(err) { MyUTIL.logException("fourthirtyCommand: " + err.message); }
 		}
@@ -7095,7 +7116,7 @@ var BOTCOMMANDS = {
 			try {
 				if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
 				if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
-				 setTimeout(function () { MyUTIL.sendChat("https://i.imgflip.com/3gce77.jpg"); }, 250);
+				 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://i.imgflip.com/3gce77.jpg"); }, 250);
 			}
 			catch(err) { MyUTIL.logException("moonrasorCommand: " + err.message); }
 		}
@@ -7110,9 +7131,9 @@ var BOTCOMMANDS = {
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 USERS.tastyVote(chat.uid, chat.message);
 						 var randomID = Math.floor(Math.random() * 3); // [0-2]
-						 if (randomID === 0) { setTimeout(function () { MyUTIL.sendChat("https://thumbs.gfycat.com/GraveBlaringChrysalis-size_restricted.gif"); }, 250); }
-						 else if (randomID === 1){ setTimeout(function () { MyUTIL.sendChat("https://forgifs.com/gallery/d/227933-2/Pendulum-wrecking-ball.gif"); }, 250); }
-						 else { setTimeout(function () { MyUTIL.sendChat("https://i.makeagif.com/media/6-21-2018/BM0WKE.gif"); }, 250); }
+						 if (randomID === 0) { setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://thumbs.gfycat.com/GraveBlaringChrysalis-size_restricted.gif"); }, 250); }
+						 else if (randomID === 1){ setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://forgifs.com/gallery/d/227933-2/Pendulum-wrecking-ball.gif"); }, 250); }
+						 else { setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://i.makeagif.com/media/6-21-2018/BM0WKE.gif"); }, 250); }
                     }
                     catch(err) { MyUTIL.logException("wreckingballCommand: " + err.message); }
                 }
@@ -7126,7 +7147,7 @@ var BOTCOMMANDS = {
                         if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 USERS.tastyVote(chat.uid, chat.message);
-						 setTimeout(function () { MyUTIL.sendChat("http://media.tumblr.com/10430abfede9cebe9776f7de26e302e4/tumblr_inline_mjzgvrh7Uv1qz4rgp.gif"); }, 250);
+						 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "http://media.tumblr.com/10430abfede9cebe9776f7de26e302e4/tumblr_inline_mjzgvrh7Uv1qz4rgp.gif"); }, 250);
                     }
                     catch(err) { MyUTIL.logException("elevenCommand: " + err.message); }
                 }
@@ -7142,7 +7163,7 @@ var BOTCOMMANDS = {
                         if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 USERS.tastyVote(chat.uid, chat.message);
-						 setTimeout(function () { MyUTIL.sendChat("https://media.giphy.com/media/ELUZ0bkF8j4ru/giphy.gif"); }, 250);
+						 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://media.giphy.com/media/ELUZ0bkF8j4ru/giphy.gif"); }, 250);
                     }
                     catch(err) { MyUTIL.logException("pianoCommand: " + err.message); }
                 }
@@ -7157,7 +7178,7 @@ var BOTCOMMANDS = {
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 USERS.tastyVote(chat.uid, chat.message);
 						 //iseven https://media1.giphy.com/media/iECvnZlpCGrIY/giphy.gif
-						 setTimeout(function () { MyUTIL.sendChat("https://media.giphy.com/media/kabkVP3FiZrSE/giphy.gif"); }, 250);
+						 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://media.giphy.com/media/kabkVP3FiZrSE/giphy.gif"); }, 250);
                     }
                     catch(err) { MyUTIL.logException("mumfordCommand: " + err.message); }
                 }
@@ -7172,7 +7193,7 @@ var BOTCOMMANDS = {
                         if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 USERS.tastyVote(chat.uid, chat.message);
-						 setTimeout(function () { MyUTIL.sendChat("https://media.tenor.com/images/952fe3b2e8cae6a8cb39aba07e5e1beb/tenor.gif"); }, 250);
+						 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://media.tenor.com/images/952fe3b2e8cae6a8cb39aba07e5e1beb/tenor.gif"); }, 250);
                     }
                     catch(err) { MyUTIL.logException("dmbCommand: " + err.message); }
                 }
@@ -7187,7 +7208,7 @@ var BOTCOMMANDS = {
                         if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
                         if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
 						 // USERS.tastyVote(chat.uid, chat.message);
-						 setTimeout(function () { MyUTIL.sendChat("https://i.imgur.com/fgU7KCL.gif"); }, 250);
+						 setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://i.imgur.com/fgU7KCL.gif"); }, 250);
                     }
                     catch(err) { MyUTIL.logException("beiberCommand: " + err.message); }
                 }
@@ -7202,7 +7223,7 @@ var BOTCOMMANDS = {
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
         if (typeof MyVARS.youtubeLink === "string")
-          MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.youtube, {
+          MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.youtube, {
             name: chat.un,
             link: MyVARS.youtubeLink
           }));
