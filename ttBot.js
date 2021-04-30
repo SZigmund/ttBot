@@ -11,6 +11,7 @@ var MyVARS = {
   botAutoDJ: true,
   botIDs: ["604bb64b47b5e3001a8fd194", "6054d87447b5e3001bd535c7"],
   botMuted: false,
+  botStarted: null,
   //chatLink: "https://raw.githack.com/SZigmund/basicBot/master/lang/en.json",
   chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/3dda247ba1ea666d95cac4d26e4a5c04810be769/lang/en.json",
   //old chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/f4b1a9d30a7e9f022ef600dd41cae07a91797bad/lang/en.json",
@@ -971,19 +972,16 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     try {
       //todo Delete this after we re-enable the bot kill on room change code.
       //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
-      if (MyVARS.botMuted === true)
-        MyUTIL.logInfo(msg);
-      else if (MyVARS.runningBot && msgType == "chat") {
-		if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!MyUTIL.isImageChat(msg))) msg = "/me " + msg;
-        MyAPI.SendChat(msg);
+      if (msgType == "chat") {
+        MyUTIL.sendChat(msg);
 	  }
-      else if (MyVARS.runningBot && msgType == "pm") {
-        MyUTIL.sendPM(msg, uid);
+      else if (msgType == "pm") {
+		MyUTIL.sendPM(msg, uid);
 	  }
       else
         MyUTIL.logChat(msg);
     } 
-	catch (err) { MyUTIL.logException("MyUTIL.sendChat: " + err.message); }
+	catch (err) { MyUTIL.logException("MyUTIL.sendChatOrPM: " + err.message); }
   },
   sendPM: function(msg, userid) { // Send chat to all
     try {
@@ -991,11 +989,13 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
       if (MyVARS.botMuted === true)
         MyUTIL.logInfo(msg);
-      else if (MyVARS.runningBot)
+      else if (MyVARS.runningBot) {
+        if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!MyUTIL.isImageChat(msg))) msg = "/me " + msg;
         MyAPI.SendPM(msg, userid);
-      else
+      }
+	  else
         MyUTIL.logChat(msg);
-    } 
+    }
 	catch (err) { MyUTIL.logException("MyUTIL.sendPM: " + err.message); }
   },
   bopCommand: function(cmd) {
@@ -1631,6 +1631,7 @@ var MyAPI = {
 	  CHAT.commandChat.un = "";
 	  var user = USERS.lookupLocalUser(message.senderid);
 	  if (user !== false) CHAT.commandChat.un = user.username;
+	  //MyUTIL.logInfo('PMUN: ' + CHAT.commandChat.un);
 	  CHAT.commandChat.uid = message.senderid.trim();
 	  CHAT.commandChat.type = "pm";
 	  return CHAT.commandChat;
@@ -1965,7 +1966,7 @@ var MyAPI = {
 			  if (message.command !== 'newsong' && message.command !== 'speak' && message.command !== 'update_votes'
 			     && message.command !== 'add_dj' && message.command !== 'rem_dj' && message.command !== 'nosong' 
 				 && message.command !== 'snagged' && message.command !== 'registered' && message.command !== 'deregistered'
-				 && message.command !== 'update_user' ) {
+				 && message.command !== 'update_user' && message.command !== 'pmmed' ) {
 				MyUTIL.logDebug("NEW MESSAGE COMMAND: " + message.command);
 				MyUTIL.logObjects(message);
 			  }
@@ -2905,7 +2906,10 @@ var USERS = {
   setUserName: function(userId, userName) {
     var user = USERS.lookupLocalUser(userId);
     if (user == false) return;
-    if (user.username !== userName) user.username = userName;
+    if ((user.username !== userName) && (userName.length > 0)) {
+		user.username = userName;
+		MyUTIL.logInfo('CHANGE NAME FROM: [' + user.username + '] TO: [' + userName + ']');
+	}
   },
   updateRolledStats: function(username, wooting) {
     try {
@@ -5694,6 +5698,19 @@ var BOTCOMMANDS = {
     }
   },
 
+  uptimeCommand: {
+    command: 'uptime',
+    rank: 'bouncer',
+    type: 'exact',
+    functionality: function(chat, cmd) {
+      if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+      if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+      else {
+		MyUTIL.sendChatOrPM(chat.type, chat.uid, MyUTIL.formatDate(MyVARS.botStarted))
+      }
+    }
+  },
+
   statusCommand: {
     command: 'status',
     rank: 'bouncer',
@@ -5705,7 +5722,8 @@ var BOTCOMMANDS = {
         var from = chat.un;
         var msg = '/me [@' + from + '] ';
 
-        msg += CHAT.chatMapping.enableAfkRemoval + ': ';
+        msg += 'Up since: ' + MyUTIL.formatDate(MyVARS.botStarted) + '. ';
+		msg += CHAT.chatMapping.enableAfkRemoval + ': ';
         if (MyVARS.enableAfkRemoval) msg += 'ON';
         else msg += 'OFF';
         msg += '. ';
@@ -7397,6 +7415,7 @@ var STARTUP = {
 		MyUTIL.randomCommentSetTimer();												//Enable random comment timer
 		setInterval(function() { MyUTIL.botKeepAlive(); }, 1000 * 60 * 60);			//Timer fires every 60 mins to keep bot alive
 		setInterval(function() { MyUTIL.botKeepAlive2(); }, 1000 * 60);				//Timer fires every 1 mins to monitor bot alive status
+		MyVARS.botStarted = Date.now(); // dateadd getdate
 		window.onbeforeunload
 		//setTimeout(function () { MyUTIL.sendChat("Larry the Bot V1.0 online"); }, 3000); 
       }
