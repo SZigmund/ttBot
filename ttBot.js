@@ -987,10 +987,13 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     try {
       //todo Delete this after we re-enable the bot kill on room change code.
       //if(MyVARS.botRoomUrl != window.location.pathname) return;  // If we leave the room where we started the bot stop displaying messages.
+      var suprAtMe = false;
+	  if (MyUTIL.isImageChat(msg)) suprAtMe = true;  // supress /me for images
+	  if ((msg.substring(0, 1) == ":") && (msg.substring((msg.length - 1), msg.length) == ":")) suprAtMe = true;  // supress /me for emoji
       if (MyVARS.botMuted === true)
         MyUTIL.logInfo(msg);
       else if (MyVARS.runningBot) {
-        if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!MyUTIL.isImageChat(msg))) msg = "/me " + msg;
+        if ((MyVARS.meMode === true) && (msg.substring(0, 3) !== "/me") && (!suprAtMe)) msg = "/me " + msg;
         MyAPI.SendPM(msg, userid);
       }
 	  else
