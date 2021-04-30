@@ -2377,7 +2377,6 @@ var BotEVENTS = {
         return;
       }
       if (!MyVARS.runningBot) return;
-	  USERS.setLastActivityID(chat.uid, chat.un, true);
       USERS.setUserName(chat.uid, chat.un);
 	  if (CHAT.chatFilter(chat)) return void(0);
       MyROOM.roomstats.chatmessages++;
@@ -2389,10 +2388,13 @@ var BotEVENTS = {
   eventPM: function(pm) {
 	try {
 	  //assume all pms are commands:
+      if (!MyVARS.runningBot) return;
 	  if ((pm.message.substring(0, 1) !== MyVARS.commandLiteral) &&
 	      (pm.message.substring(0, 1) !== MyVARS.commandLiteral2)) pm.message = MyVARS.commandLiteral + pm.message;
+      MyROOM.roomstats.PMs++;
       if (CHAT.commandCheck(pm)) return;
 	  MyUTIL.sendPM("I don't understand that.", pm.uid);
+	  //todoer: Add "Help" & "Command" commands
 	  MyUTIL.sendPM("To join the waitlist type: .q .wait or .addme", pm.uid)
 	}
     catch (err) {	MyUTIL.logException("eventPM: " + err.message); }
@@ -3064,7 +3066,8 @@ var MyROOM = {
     tastyCount: 0,
     launchTime: null,
     songCount: 0,
-    chatmessages: 0
+    chatmessages: 0,
+    PMs: 0
   },
   users: [],
 };
@@ -3283,6 +3286,7 @@ var CHAT = {
     try {
       var cmd;
       //UTIL.logObject(chat, "chat");
+	  USERS.setLastActivityID(chat.uid, chat.un, true);
 	  if (chat.message.substring(0, 1) === MyVARS.commandLiteral2) chat.message = MyVARS.commandLiteral + chat.message.substring(1);
       if (chat.message.substring(0, 1) === MyVARS.commandLiteral) {
         var space = chat.message.indexOf(' ');
@@ -6234,9 +6238,9 @@ var BOTCOMMANDS = {
       if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
       if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
       else {
-        if (typeof MyVARS.website === "string")
+        if (typeof MyVARS.fbLink === "string")
           MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.website, {
-            link: MyVARS.website
+            link: MyVARS.fbLink
           }));
       }
     }
@@ -6466,9 +6470,10 @@ var BOTCOMMANDS = {
             name: chat.un,
             roll: MyUTIL.numberToIcon(rollResults)
           });
-          wooting = false;
+		  wooting = false;
         }
-        MyUTIL.sendChat(resultsMsg + USERS.updateRolledStats(chat.un, wooting));
+        if (chat.type == "pm") MyUTIL.sendPM(MyUTIL.numberToIcon(rollResults), chat.uid);
+		MyUTIL.sendChat(resultsMsg + USERS.updateRolledStats(chat.un, wooting));
       } catch (err) {
         MyUTIL.logException("rollCommand: " + err.message);
       }
@@ -7327,7 +7332,7 @@ var STORAGE = {
         MyROOM.users = room.users;
         MyROOM.historyList = room.historyList;
         MyUTIL.logDebug("MyROOM.users.length: " + MyROOM.users.length + " TIME: " + JSON.parse(info).time);
-        if ((elapsed < 1 * 60 * 60 * 1000)) {
+        if ((elapsed < 10 * 60 * 1000)) {
           MyUTIL.logChat(CHAT.chatMapping.retrievingdata);
           for (var prop in stored_settings) {
             MyVARS[prop] = stored_settings[prop];
