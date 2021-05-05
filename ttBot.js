@@ -1,3 +1,85 @@
+//SECTION SLOTS: Slot machine game!
+var SLOTS = {
+	wheel1: "CCCCCAAAABBBMEEELLLP",
+	wheel2: "CCAAAABBBBMEEELLLLLP",
+	wheel3: "CCCAAAABBBBMELLLLLLP",
+	users: [],
+	slotPlayers: [], // .push(new USERS.User(user.id, user.username));
+  playSlots: function(bet, chat) {
+    try			{	
+	  var mySpin =    SLOTS.spinTheWheel();
+	                  SLOTS.displaySpin(chat, mySpin);
+	  var payout =    SLOTS.calculatePayout(mySpin, bet);
+	                  SLOTS.reportPayout(chat, payout);
+	  //var balance =   SLOTS.updateBank(chat, payout);
+	  //                SLOTS.reportBalance(chat, balance);
+	}
+    catch (err) {	console.log("SLOTS.playSlots: " + err.message); }
+  },
+  reportPayout: function(chat, payout) {
+    try {
+		var msg = '';
+		if (payout > 0) msg = 'Congrats ' + chat.un + ' you won $' + payout.toString();
+		else            msg = 'Sorry ' + chat.un + ' you lost';
+		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msg); }, 500);  //TODOER FIX THIS to just be to CHAT
+	}
+    catch (err) {	console.log("SLOTS.reportPayout: " + err.message); }
+  },
+  displaySpin: function(chat, mySpin) {
+    try {
+		var msg = SLOTS.letterToFruit(mySpin.substring(0,1)) + ' ';
+		msg += SLOTS.letterToFruit(mySpin.substring(1,2)) + ' ';
+		msg += SLOTS.letterToFruit(mySpin.substring(2,3));
+		MyUTIL.sendChatOrPM(chat.type, chat.uid, msg); //TODOER FIX THIS to just be to CHAT
+	}
+    catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
+  },
+  spinTheWheel: function() {
+    try			{
+	  var val = Math.floor(Math.random() * 20);
+	  var mySpin = SLOTS.wheel1.substring(val, val + 1);
+	  val = Math.floor(Math.random() * 20);
+	  mySpin += SLOTS.wheel1.substring(val, val + 1);
+	  val = Math.floor(Math.random() * 20);
+	  mySpin += SLOTS.wheel1.substring(val, val + 1);
+	  return mySpin;
+	}
+    catch (err) {	console.log("SLOTS.spinTheWheel: " + err.message); }
+  },
+  calculatePayout: function(mySpin, bet) {
+    try			{
+	  if (mySpin === "MMM") return bet * 500;			//Melons
+	  else if (mySpin === "PPP") return bet * 100;	//Peaches
+	  else if (mySpin === "EEE") return bet * 50;		//Eggplants
+	  else if (mySpin === "BBB") return bet * 20;		//Bananas
+	  else if (mySpin === "AAA") return bet * 15;		//Pineapple
+	  else if (mySpin === "CCC") return bet * 10;		//Cherries
+	  else if (((mySpin.match(/C/g) || []).length) === 2) return bet * 5;   // << strmatch
+	  else if (((mySpin.match(/C/g) || []).length) === 1) return bet * 2;   // << strmatch
+	  return 0;
+	}
+    catch (err) {	console.log("SLOTS.calculatePayout: " + err.message); }
+  },
+  letterToFruit: function(letter) {
+    try			{	
+    switch (letter) {
+      case 'A': return ':pineapple:';
+      case 'B': return ':banana:';
+      case 'C': return ':cherries:';
+      case 'E': return ':eggplant:';
+      case 'L': return ':lemon:';
+      case 'M': return ':melon: ';
+      case 'P': return ':peach:';
+	  }
+	}
+    catch (err) {	console.log("SLOTS.letterToFruit: " + err.message); }
+  },
+};
+
+//  :apple: :green_apple: :tangerine: :lemon: :cherries: :grapes: :watermelon: :strawberry:
+//  :peach: :melon: :banana: :pear: :pineapple: :sweet_potato: :eggplant: :tomato: :corn:
+
+//TODER: TEST echo2chat echo2PM customCommand randomCommand 
 //SECTION SETTINGS: All local settings: 
 var MyVARS = {
   afkResetTime: 120,		//Reset afk if dj joins queue after the afkResetTime
@@ -409,6 +491,9 @@ var MyCOMMENTS = {
     "The older I get, the more people can kiss my a$$",
     "I can't tell if you are on too many drugs or not enough.",
     "My doctor told me to start killing people... Well not in those exact words.  He said I had to reduce stress in my life, which is pretty much the same thing.",
+	"Pros & Cons of making food.  PROS: Food, CONS: Making.",
+	"Cleaning is just putting stuff in less obvious places",
+	"I do not have my ducks in a row, I have squirrels and they're at a rave.",
     "Love is spending the rest of your life with someone you want to kill & not doing it because you'd miss them!",
     "And there goes the last F*ck I gave!",
     "My girlfriend woke up this morning with a huge smile on her face.....I love Sharpies!",
@@ -2214,10 +2299,11 @@ var MyAPI = {
     try {
 		if (MyVARS.debugMode) console.log("CHAT: " + msg);
 		var e = turntable.sendMessage({
-				api: "room.speak",
-				roomid: turntable.buddyList.room.roomId,
-				section: turntable.buddyList.room.section,
-				text: msg
+				"api": "room.speak",
+				"roomid": turntable.buddyList.room.roomId,
+				"section": turntable.buddyList.room.section,
+				"senderid": MyAPI.CurrentUserID(),
+				"text": msg
 			});
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SendChat: " + err.message); }
@@ -2238,7 +2324,8 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
     try {
 		turntable.sendMessage({
 			"api": "pm.send", 
-			"receiverid": userid, 
+			"receiverid": userid,
+			"senderid": MyAPI.CurrentUserID(),
 			"text": msg.toString()
 			});
     } 
@@ -2902,7 +2989,7 @@ var USERS = {
 	    user = USERS.lookupLocalUser(userId);
 	  }
 	  if (user == false) return; // This shouldn't happen.
-      USERS.setLastActivity(user, dispMsg);     //todoer
+      USERS.setLastActivity(user, dispMsg);
 	}
 	catch (err) { MyUTIL.logException("USERS.setLastActivityID: " + err.message); }
   },
@@ -2996,7 +3083,7 @@ var USERS = {
   },
   eventUserjoin: function(user) {
     try {
-      if (!MyVARS.runningBot) return; //todoer spit out the user link to local screen if NOT running bot
+      if (!MyVARS.runningBot) return;
       var xUser = USERS.lookupLocalUser(user.id);
       var greet = true;
       var welcomeback = null;
@@ -6198,28 +6285,24 @@ var BOTCOMMANDS = {
     }
   },
 
+//TODER: TEST echo2chat customCommand randomCommand 
   echoCommand: { //Added 01/27/2015 Zig
-    command: 'echo',
+    command: ['echo','echo2chat'],
     rank: 'manager',
     type: 'startsWith',
     functionality: function(chat, cmd) {
       try {
-        //MyUTIL.logDebug("echoCommand:1");
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
-        //MyUTIL.logDebug("echoCommand:2");
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        //MyUTIL.logDebug("echoCommand:3");
         var msg = chat.message;
         if (msg.length === cmd.length) return;
-        //MyUTIL.logDebug("echoCommand:4");
         var msgContent = msg.substring(cmd.length + 1);
         msgContent = msgContent.replace(/&#39;/g, "'");
         MyUTIL.logInfo(chat.un + " used echo: " + msgContent);
-        // OLD return MyUTIL.sendChat(msgContent);
-        return MyUTIL.sendChatOrPM(chat.type, chat.uid, msgContent);
-      } catch (err) {
-        MyUTIL.logException("echoCommand: " + err.message);
-      }
+		if (cmd === 'echo2chat') 	return MyUTIL.sendChat(msgContent);
+		else        				return MyUTIL.sendChatOrPM(chat.type, chat.uid, msgContent);
+      } 
+	  catch (err) { MyUTIL.logException("echoCommand: " + err.message); }
     }
   },
   //beerCommand: {   //Added 02/25/2015 Zig
@@ -6361,7 +6444,6 @@ var BOTCOMMANDS = {
 		if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
 		var looper = 0;
 		var removeCnt = 0;
-		//todoererererer TEST:
 		while ((MyROOM.queue.id.indexOf(chat.uid) > -1) && (looper < 10)) {
 		  MyROOM.queue.id.splice(MyROOM.queue.id.indexOf(chat.uid),1);
 		  looper++;
@@ -6448,6 +6530,26 @@ var BOTCOMMANDS = {
   },
   
   
+  slotsCommand: { //Added 03/30/2015 Zig
+    command: ['XXXslots','XXXslot','XXXspintowin'],
+    rank: 'user',
+    type: 'startsWith',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+        var msg = chat.message;
+        var bet = 1;
+        if (msg.length > cmd.length) {
+          var myBet = msg.substr(cmd.length + 1);
+          if (!isNaN(myBet)) bet = myBet;
+		  //todoer cannot bet > user balance
+        }
+		SLOTS.playSlots(bet, chat);
+      } 
+	  catch (err) { MyUTIL.logException("slotsCommand: " + err.message); }
+    }
+  },
   
   rollCommand: { //Added 03/30/2015 Zig
     command: ['roll','spin','hitme','throw','dice','rollem','toss','fling','pitch','shoot','showmethemoney','letsdothisthing','rool'],
@@ -6495,9 +6597,8 @@ var BOTCOMMANDS = {
         }
         if (chat.type == "pm") MyUTIL.sendPM(MyUTIL.numberToIcon(rollResults), chat.uid);
 		MyUTIL.sendChat(resultsMsg + USERS.updateRolledStats(chat.un, wooting));
-      } catch (err) {
-        MyUTIL.logException("rollCommand: " + err.message);
-      }
+      } 
+	  catch (err) { MyUTIL.logException("rollCommand: " + err.message); }
     }
   },
   meetingCommand: { //Added 03/28/2015 Zig
@@ -6624,6 +6725,39 @@ var BOTCOMMANDS = {
       }
     }
   },
+  /*
+  //TODER: TEST echo2chat customCommand randomCommand 
+  customCommand: {  // Custom Tasty  (taf = Tasty As F)
+    command: ['custom','ct','taf','cust'],
+    rank: 'manager',
+    type: 'startsWith',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+		if (msg.length === cmd.length) sendChatOrPM("missing the custom tasty command");
+		chat.message = chat.message.replace(MyVARS.commandLiteral, "");
+		chat.message = chat.message.replace(cmd, "");
+		USERS.tastyVote(chat.uid, chat.message);
+      } 
+	  catch (err) { MyUTIL.logException("customCommand: " + err.message); }
+    }
+  },
+  //TODER: TEST echo2chat customCommand randomCommand 
+  randomCommand: {  // Custom Tasty  (taf = Tasty As F)
+    command: ['rand','random','ifeellucky'],
+    rank: 'manager',
+    type: 'startsWith',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+		USERS.tastyVote(chat.uid, "");
+      } 
+	  catch (err) { MyUTIL.logException("randomCommand: " + err.message); }
+    }
+  },
+  */
   lastplayedCommand: {
     command: 'lastplayed',
     rank: 'user',
@@ -7419,7 +7553,7 @@ var STARTUP = {
 		setInterval(function() { MyUTIL.botKeepAlive(); }, 1000 * 60 * 60);			//Timer fires every 60 mins to keep bot alive
 		setInterval(function() { MyUTIL.botKeepAlive2(); }, 1000 * 60);				//Timer fires every 1 mins to monitor bot alive status
 		MyVARS.botStarted = Date.now(); // dateadd getdate
-		window.onbeforeunload
+		//Try1: window.onbeforeunload
 		//setTimeout(function () { MyUTIL.sendChat("Larry the Bot V1.0 online"); }, 3000); 
       }
 	  catch (err) { MyUTIL.logException("STARTUP.initbot: " + err.message); }
@@ -7427,16 +7561,43 @@ var STARTUP = {
   monitorPageChange: function() {
     try{
 	  // Log the state data to the console
-	  window.addEventListener('popstate', function (event) { MyUTIL.logInfo(event.state);	});
+	  window.addEventListener('popstate', function (event) { MyUTIL.logInfo('POP STATE: ' + event.state);	});
+
+	// Try3:
+	  window.addEventListener('beforeunload', (event) => {
+		  // Cancel the event as stated by the standard.
+		  event.preventDefault();
+		  // Chrome requires returnValue to be set.
+		  event.returnValue = '';});
+	
+	//Try2:
+	/*
+	(function () {
+    var location = window.document.location;
+
+    var preventNavigation = function () {
+        var originalHashValue = location.hash;
+
+        window.setTimeout(function () {
+            location.hash = 'preventNavigation' + ~~ (9999 * Math.random());
+            location.hash = originalHashValue;
+        }, 0);
+    };
+
+    window.addEventListener('beforeunload', preventNavigation, false);
+    window.addEventListener('unload', preventNavigation, false);
+})();
+*/
+	// Try2*/
     }
     catch (err) { MyUTIL.logException("STARTUP.monitorPageChange: " + err.message); }
   },
 };
 
-window.onbeforeunload = function() {
-    MyUTIL.logInfo("Request to leave page: " + MyUTIL.formatDate(Date.now()));
-	return "";
-};
+//Try1: window.onbeforeunload = function() {
+//Try1:     MyUTIL.logInfo("Request to leave page: " + MyUTIL.formatDate(Date.now()));
+//Try1: 	return "";
+//Try1: };
 
 if (!window.APIisRunning) {
   STARTUP.initbot();
