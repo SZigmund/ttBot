@@ -1,55 +1,68 @@
-//SECTION SLOTS: Slot machine game!
+//4967.33
+
+//SECTION SLOTS: Slot machine game!  // http://edspi31415.blogspot.com/2014/01/probability-odds-of-winning-at-slot.html
 var SLOTS = {
-	wheel1: "CCCCCAAAABBBMEEELLLP",
-	wheel2: "CCAAAABBBBMEEELLLLLP",
-	wheel3: "CCCAAAABBBBMELLLLLLP",
-	users: [],
-	slotPlayers: [], // .push(new USERS.User(user.id, user.username));
+	wheel1: "CCCLLBBBEEELLLMPAAAA",
+	wheel2: "CCBBBBEEELLLLLMPAAAA",
+	wheel3: "CCCBBBBELLLLLLMPAAAA",
+    DOY: -1,
+    dailyIncrease: 200,
+	maxBetsPerDay: 10,
+	minBetsPerSpin: 100,
+	maxBetsPerSpin: 1000,
+	privateSlotsMode: true,   //Set to always PM all rolls and responses
+	Players: [], // .push(new USERS.User(user.id, user.username));
+    slotPlayer: function(uid, DOY) {
+      this.uid = uid;
+      this.balance = 2000;
+      this.DOYLastPlay = DOY;
+	  this.winCount = 0;
+	  this.lossCount = 0;
+	  this.cashBet = 0;
+	  this.cashWon = 0;
+	  this.cashLoss = 0;
+	  this.dailyBets = 0;
+	  this.dailyWages = 0;
+	  this.tastyWages = 0;
+    },
+
   playSlots: function(bet, chat) {
-    try			{	
-	  var mySpin =    SLOTS.spinTheWheel();
-	                  SLOTS.displaySpin(chat, mySpin);
-	  var payout =    SLOTS.calculatePayout(mySpin, bet);
-	                  SLOTS.reportPayout(chat, payout);
-	  //var balance =   SLOTS.updateBank(chat, payout);
-	  //                SLOTS.reportBalance(chat, balance);
+    try			{
+	  //if (!MyUTIL.IsTestBot(chat.uid)) return;  //TODOERERER REMOVE THIS
+	  //if (MyUTIL.IsClubDeez()) return;			//TODOERERER REMOVE THIS
+	  if (SLOTS.getPlayer(chat.uid) === -1) SLOTS.createPlayer(chat);
+	  var player =	SLOTS.getPlayer(chat.uid);
+	  player = SLOTS.addDailyCash(player);
+	  if (SLOTS.invalidBet(player, bet, chat)) return;
+	  //After reporting issues, force to be in chat if not set to private mode:
+	  chat.type = (SLOTS.privateSlotsMode === true) ? chat.type : 'chat';
+	  var mySpin =  SLOTS.spinTheWheel();
+	  SLOTS.displaySpin(chat, mySpin);
+	  var payout =  SLOTS.calculatePayout(mySpin, bet);
+	  player = SLOTS.updatePlayerStats(player, payout, bet);
+	  SLOTS.reportPayout(chat, payout, player);
+	  STORAGE.storeToStorage();
 	}
     catch (err) {	console.log("SLOTS.playSlots: " + err.message); }
   },
-  reportPayout: function(chat, payout) {
+  addDailyCash: function(player) {
     try {
-		var msg = '';
-		if (payout > 0) msg = 'Congrats ' + chat.un + ' you won $' + payout.toString();
-		else            msg = 'Sorry ' + chat.un + ' you lost';
-		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msg); }, 500);  //TODOER FIX THIS to just be to CHAT
-	}
-    catch (err) {	console.log("SLOTS.reportPayout: " + err.message); }
-  },
-  displaySpin: function(chat, mySpin) {
-    try {
-		var msg = SLOTS.letterToFruit(mySpin.substring(0,1)) + ' ';
-		msg += SLOTS.letterToFruit(mySpin.substring(1,2)) + ' ';
-		msg += SLOTS.letterToFruit(mySpin.substring(2,3));
-		MyUTIL.sendChatOrPM(chat.type, chat.uid, msg); //TODOER FIX THIS to just be to CHAT
-	}
-    catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
-  },
-  spinTheWheel: function() {
-    try			{
-	  var val = Math.floor(Math.random() * 20);
-	  var mySpin = SLOTS.wheel1.substring(val, val + 1);
-	  val = Math.floor(Math.random() * 20);
-	  mySpin += SLOTS.wheel1.substring(val, val + 1);
-	  val = Math.floor(Math.random() * 20);
-	  mySpin += SLOTS.wheel1.substring(val, val + 1);
-	  return mySpin;
-	}
-    catch (err) {	console.log("SLOTS.spinTheWheel: " + err.message); }
+      if (player.DOYLastPlay !== MyUTIL.getDOY()) {
+		player.DOYLastPlay == MyUTIL.getDOY();
+		player.balance += SLOTS.dailyIncrease;
+		player.dailyWages += SLOTS.dailyIncrease;
+		player.dailyBets = 0;
+	  }
+	  return player;
+    } 
+	catch (err) { MyUTIL.logException("SLOTS.addDailyCash: " + err.message);
+      return "";
+    }
   },
   calculatePayout: function(mySpin, bet) {
     try			{
 	  if (mySpin === "MMM") return bet * 500;			//Melons
-	  else if (mySpin === "PPP") return bet * 100;	//Peaches
+	  else if (mySpin === "PPP") return bet * 100;		//Peaches
 	  else if (mySpin === "EEE") return bet * 50;		//Eggplants
 	  else if (mySpin === "BBB") return bet * 20;		//Bananas
 	  else if (mySpin === "AAA") return bet * 15;		//Pineapple
@@ -59,6 +72,65 @@ var SLOTS = {
 	  return 0;
 	}
     catch (err) {	console.log("SLOTS.calculatePayout: " + err.message); }
+  },
+  createPlayer: function(chat) {
+    try {
+	  SLOTS.Players.push(new SLOTS.slotPlayer(chat.uid, MyUTIL.getDOY()));
+	}
+    catch (err) {	console.log("SLOTS.createPlayer: " + err.message); }
+  },
+  displaySpin: function(chat, mySpin) {
+    try {
+		var msg = SLOTS.letterToFruit(mySpin.substring(0,1)) + ' ';
+		msg += SLOTS.letterToFruit(mySpin.substring(1,2)) + ' ';
+		msg += SLOTS.letterToFruit(mySpin.substring(2,3));
+		MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
+	}
+    catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
+  },
+  explainSlots: function(chat) {
+    try {
+	  chat.type = (SLOTS.privateSlotsMode === true) ? chat.type : 'chat';
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, "Type .slots to play slots.");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "Winnings per $" + SLOTS.minBetsPerSpin + " bet:"); }, 100);
+	  var msgM = SLOTS.letterToFruit("M");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgM + msgM + msgM + ' $' + (500 * SLOTS.minBetsPerSpin).toString()); }, 200);
+	  var msgP = SLOTS.letterToFruit("P");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgP + msgP + msgP + ' $' + (100 * SLOTS.minBetsPerSpin).toString()); }, 300);
+	  var msgE = SLOTS.letterToFruit("E");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgE + msgE + msgE + ' $' + (50 * SLOTS.minBetsPerSpin).toString()); }, 400);
+	  var msgB = SLOTS.letterToFruit("B");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgB + msgB + msgB + ' $' + (20 * SLOTS.minBetsPerSpin).toString()); }, 500);
+	  var msgA = SLOTS.letterToFruit("A");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgA + msgA + msgA + ' $' + (15 * SLOTS.minBetsPerSpin).toString()); }, 600);
+	  var msgC = SLOTS.letterToFruit("C");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgC + msgC + msgC + ' $' + (10 * SLOTS.minBetsPerSpin).toString()); }, 700);
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgC + msgC + ' $' + (5 * SLOTS.minBetsPerSpin).toString()); }, 800);
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgC + ' $' + (2 * SLOTS.minBetsPerSpin).toString()); }, 900);
+	  var msgL = SLOTS.letterToFruit("L");
+	  setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msgL + ' just suck'); }, 1000);
+	}
+    catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
+  },
+  getPlayer: function(uid) {
+    try {
+	  var results = -1;
+	  SLOTS.Players.forEach(player => { if (player.uid == uid) results = player; });
+	  return results;
+	}
+    catch (err) {	console.log("SLOTS.getPlayer: " + err.message); }
+  },
+  invalidBet: function(player, bet, chat) {
+    try {
+  	  var validBet = false;
+	  if (bet > player.balance) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Bet exceeds available balance: $" + player.balance);
+	  if (player.dailyBets >= SLOTS.maxBetsPerDay) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slot max daily plays: " + SLOTS.maxBetsPerDay);
+	  else if (bet > SLOTS.maxBetsPerSpin) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Maximum bet: $" + SLOTS.maxBetsPerSpin);
+	  else if (bet < SLOTS.minBetsPerSpin) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Minimum bet: $" + SLOTS.minBetsPerSpin);
+	  else validBet = true;
+	  return (!validBet);
+	}
+    catch (err) {	console.log("SLOTS.invalidBet: " + err.message); }
   },
   letterToFruit: function(letter) {
     try			{	
@@ -73,6 +145,54 @@ var SLOTS = {
 	  }
 	}
     catch (err) {	console.log("SLOTS.letterToFruit: " + err.message); }
+  },
+  reportPayout: function(chat, payout, player) {
+    try {
+		var msg = '';
+		if (payout > 0) msg = 'Congrats ' + chat.un + ' you won $' + payout.toString() + ' :moneybag:';
+		else            msg = 'Sorry ' + chat.un + ' you lost';
+
+		msg += " (Bank: $" + player.balance + ")";
+		setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, msg); }, 500);
+	}
+    catch (err) {	console.log("SLOTS.reportPayout: " + err.message); }
+  },
+  slotStats: function(chat, uid, un) {
+    try			{
+	  var player =	SLOTS.getPlayer(uid);
+	  if (player === -1) return MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Could not locate slot stats for ' + chat.un + '.');
+	  var msg = un + ' stats: ' + '[Wins: ' + player.winCount + '/' + (player.winCount + player.lossCount) + ' ' +
+	            MyUTIL.formatPercentage(player.winCount, (player.winCount + player.lossCount), 0) + ']'
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
+	  setTimeout(function () { 
+	   MyUTIL.sendChatOrPM(chat.type, chat.uid, '[Bets: $' + player.cashBet + '] [Winnings: $' + player.cashWon + '][Losses: $' +  player.cashLoss + ']'); }, 250);
+	}
+    catch (err) {	console.log("SLOTS.slotStats: " + err.message); }
+  },
+  spinTheWheel: function() {
+    try			{
+	  var val = Math.floor(Math.random() * 20);
+	  var mySpin = SLOTS.wheel1.substring(val, val + 1);
+	  val = Math.floor(Math.random() * 20);
+	  mySpin += SLOTS.wheel1.substring(val, val + 1);
+	  val = Math.floor(Math.random() * 20);
+	  mySpin += SLOTS.wheel1.substring(val, val + 1);
+	  return mySpin;
+	}
+    catch (err) {	console.log("SLOTS.spinTheWheel: " + err.message); }
+  },
+  updatePlayerStats: function(player, payout, bet) {
+    try {
+	  player.balance += (payout - bet);
+	  player.winCount += (payout > 0) ? 1 : 0;
+	  player.lossCount += (payout > 0) ? 0 : 1;
+	  player.cashBet += bet;
+	  player.cashWon += (payout > 0) ? (payout - bet) : 0;
+	  player.cashLoss += (payout > 0) ? 0 : bet;
+	  player.dailyBets += 1;
+	  return player;
+	}
+    catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
   },
 };
 
@@ -100,6 +220,8 @@ var MyVARS = {
   commandCooldown: 15,
   commandLiteral: ".",
   commandLiteral2: "/",
+  clubDeezID: "6040fa783f4bfc001b27d316",
+  larrysLabID: "60550d9447b5e3001bd53bf1",
   docID: "6047879a47c69b001bdbcd9c",
   larryID: "604bb64b47b5e3001a8fd194",
   testbot1ID: "6054d87447b5e3001bd535c7",
@@ -974,6 +1096,12 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     try			{	return (MyAPI.userInDjList(MyAPI.CurrentUserID())); }
     catch (err) {	MyUTIL.logException("MyUTIL.IsBotInDjList: " + err.message); }
   },
+  IsClubDeez: function(uid) {
+	  return (MyAPI.CurrentRoomID() === MyVARS.clubDeezID);
+  },
+  IsLarrysLab: function(uid) {
+	  return (MyAPI.CurrentRoomID() === MyVARS.larrysLabID);
+  },
   IsDoc: function(uid) {
 	  return (uid === MyVARS.docID);
   },
@@ -1086,6 +1214,20 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     }
 	catch (err) { MyUTIL.logException("MyUTIL.sendPM: " + err.message); }
   },
+  defineCommandExecuteOnName: function(chat, cmd) {
+    try {
+	  var name = '';
+	  var msg = chat.message.trim();
+	  if (msg.length === cmd.length) name = chat.un;
+      else {
+        name = msg.substring(cmd.length + 1).trim();
+		if (name.substring(0,1) == '@') name = name.substring(1);
+      }
+	  return name;
+    }
+	catch (err) { MyUTIL.logException("MyUTIL.defineCommandExecuteOnName: " + err.message); }
+  },
+
   bopCommand: function(cmd) {
     try {
       //TODO: menorah xmas dreidel plus many other holiday commands  (Only work if the month is 12)
@@ -2301,10 +2443,10 @@ var MyAPI = {
 		var e = turntable.sendMessage({
 				"api": "room.speak",
 				"roomid": turntable.buddyList.room.roomId,
-				"section": turntable.buddyList.room.section,
-				"senderid": MyAPI.CurrentUserID(),
-				"text": msg
+				"text": msg.toString()
 			});
+				//"section": turntable.buddyList.room.section,
+				//"senderid": MyAPI.CurrentUserID(),
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SendChat: " + err.message); }
   },
@@ -3173,15 +3315,15 @@ var WAITLIST = {
   waitlistEnabled: true,
 
   // called when a user requests to get added to the wailist: (Called from addmecommand) chat
-  addToWaitlist: function(userid, username) {
+  addToWaitlist: function(chat) {
     try {
-		if (WAITLIST.waitlistEnabled === false) return MyUTIL.sendChat("DJ Waitlist is currently disabled.");
-		if (MyAPI.userInDjList(userid)) return MyUTIL.sendChat("Cannot join waitlist, you are already djing." + username);
-		if ((MyAPI.djCount() < WAITLIST.maxDJCount) && (!WAITLIST.waitingOnDj)) return MyUTIL.sendChat("No waiting, hop up now " + username);
-		if (MyROOM.queue.id.indexOf(userid) > -1) return MyUTIL.sendChat("/me " + username + " you are already on the waitlist. (Position:  " + (MyROOM.queue.id.indexOf(userid) + 1).toString() + ")");
-        if (MyROOM.queue.id.indexOf(userid) === -1) { MyROOM.queue.id.push(userid); }
+		if (WAITLIST.waitlistEnabled === false) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "DJ Waitlist is currently disabled."); return; }
+		if (MyAPI.userInDjList(chat.uid)) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "Cannot join waitlist, you are already djing." + chat.un); return; }
+		if (MyROOM.queue.id.indexOf(chat.uid) > -1) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "/me " + chat.un + " you are already on the waitlist. (Position:  " + (MyROOM.queue.id.indexOf(chat.uid) + 1).toString() + ")");  return; }
+		if ((MyAPI.djCount() < WAITLIST.maxDJCount) && (!WAITLIST.waitingOnDj)) return MyUTIL.sendChat("No waiting, hop up now " + chat.un);
+        if (MyROOM.queue.id.indexOf(chat.uid) === -1) { MyROOM.queue.id.push(chat.uid); }
 		STORAGE.storeToStorage();
-		MyUTIL.sendChat("/me " + username + " you are currently number " + (MyROOM.queue.id.indexOf(userid) + 1).toString() + " on the waitlist.");
+		MyUTIL.sendChat("/me " + chat.un + " you are currently number " + (MyROOM.queue.id.indexOf(chat.uid) + 1).toString() + " on the waitlist.");
 	}
 	catch (err) { MyUTIL.logException("WAITLIST.addToWaitlist: " + err.message); }
   },
@@ -3562,10 +3704,6 @@ var BOTCOMMANDS = {
   //                    }
   //            }
   //    },
-
-/*        // OLD return MyUTIL.sendChat(msgContent);
-        return MyUTIL.sendChatOrPM(chat.type, chat.uid, msgContent);
-*/
 
   activeCommand: {
     command: 'active',
@@ -6430,7 +6568,7 @@ var BOTCOMMANDS = {
     functionality: function(chat, cmd) {
       try {
 		if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-		WAITLIST.addToWaitlist(chat.uid, chat.un, true);
+		WAITLIST.addToWaitlist(chat);
       } 
 	  catch (err) { MyUTIL.logException("addmeCommand: " + err.message); }
     }
@@ -6531,7 +6669,7 @@ var BOTCOMMANDS = {
   
   
   slotsCommand: { //Added 03/30/2015 Zig
-    command: ['XXXslots','XXXslot','XXXspintowin'],
+    command: ['slots','slot','spintowin'],
     rank: 'user',
     type: 'startsWith',
     functionality: function(chat, cmd) {
@@ -6539,17 +6677,47 @@ var BOTCOMMANDS = {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         var msg = chat.message;
-        var bet = 1;
+        var bet = SLOTS.minBetsPerSpin;
         if (msg.length > cmd.length) {
           var myBet = msg.substr(cmd.length + 1);
           if (!isNaN(myBet)) bet = myBet;
-		  //todoer cannot bet > user balance
         }
-		SLOTS.playSlots(bet, chat);
+		SLOTS.playSlots(parseInt(bet), chat);
       } 
 	  catch (err) { MyUTIL.logException("slotsCommand: " + err.message); }
     }
   },
+  slothelpCommand: { //Added 03/30/2015 Zig
+    command: ['slots?','slot?'],
+    rank: 'user',
+    type: 'startsWith',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+		SLOTS.explainSlots(chat);
+      } 
+	  catch (err) { MyUTIL.logException("slothelpCommand: " + err.message); }
+    }
+  },
+  slotStatsCommand: { //'boot'
+    command: ['slotstats','slotstat'],
+    rank: 'user',
+    type: 'startsWith',
+    functionality: function(chat, cmd) {
+      try {
+        if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
+        if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
+		var user = USERS.lookupLocalUser(name); 
+		if (typeof user === 'boolean') 
+		  return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, { name: chat.un }));
+		SLOTS.slotStats(chat, user.id, user.username);
+      } 
+	  catch (err) { MyUTIL.logException("slotsCommand: " + err.message); }
+    }
+  },
+  //
   
   rollCommand: { //Added 03/30/2015 Zig
     command: ['roll','spin','hitme','throw','dice','rollem','toss','fling','pitch','shoot','showmethemoney','letsdothisthing','rool'],
@@ -7421,10 +7589,14 @@ var PERM = {
 var STORAGE = {
   storeToStorage: function() {
     try {
+	  // Prevent saving empty player list:
+	  if ((MyUTIL.IsClubDeez()) && (MyROOM.users.length < 20)) return;
+	  if ((MyUTIL.IsLarrysLab()) && (MyROOM.users.length < 3)) return;
       //MyUTIL.logDebug("START: storeToStorage");
       localStorage.setItem("basicBotsettings", JSON.stringify(MyVARS));
       //MyUTIL.logDebug("SETTING DATA STORED");
       localStorage.setItem("basicBotRoom", JSON.stringify(MyROOM));
+      localStorage.setItem("basicBotSlots", JSON.stringify(SLOTS.Players));
       //MyUTIL.logDebug("ROOM DATA STORED");
       // todoer Figure this shit OUT!!!
       //              this.votes = {
@@ -7465,6 +7637,9 @@ var STORAGE = {
       if (info === null) MyUTIL.logChat(CHAT.chatMapping.nodatafound);
       else {
         var stored_settings = JSON.parse(localStorage.getItem("basicBotsettings"));
+        if (SLOTS.Players.length === 0) {
+		  SLOTS.Players = JSON.parse(localStorage.getItem("basicBotSlots"));
+		}
         var room = JSON.parse(localStorage.getItem("basicBotRoom"));
         MyUTIL.logDebug("room.users.length: " + room.users.length);
         if (localStorage.getItem("BLACKLIST") !== null) {
@@ -7539,6 +7714,7 @@ var STARTUP = {
   initbot: function() {
       try{
         if (window.APIisRunning) return;
+		if (MyROOM.users.length > 0) return;  // Prevent loading twice
         window.APIisRunning = true;
 	    BotEVENTS.connectAPI();
         CHAT.loadChat();
