@@ -1328,6 +1328,10 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
   botKeepAlive2: function() {
     try {
 	  MyUTIL.logInfo(MyUTIL.formatDate(Date.now()));
+	  if (turntable.buddyList.room.volumePercentage > 1.0)
+	    turntable.buddyList.room.volumePercentage = 1.5;
+	  else
+	  turntable.buddyList.room.volumePercentage = 0.20;
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.botKeepAlive2: " + err.message); }
   },
@@ -7782,117 +7786,3 @@ if (!window.APIisRunning) {
 } else {
   setTimeout(function() {STARTUP.initbot();}, 1000);
 };
-
-/*
-var e = turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "Dude".toString()});
-turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "TEST"});
-*/
-// Log all skip songs, Dj Removals, skipsong
-/*
-      	  setTimeout(function() { MyUTIL.skipSong(false); }, 500);
-      	  setTimeout(function() { MyUTIL.removeDJ(bootuser.id); }, 1000);
-*/
-
-// TESTING: DJ Waitlist ****  Issues with 
-// DONE: BotSnag grabsong
-// DONE: User split
-// DONE: SONG TOO LONG
-// DONE: SONG IN HIST
-// DONE: AFK DJ 
-// DONE: ImOut
-// DONE: Bot DJ
-
-// NEXT: THEME/GENRE  - No EDM or Kiddie songs.
-// NEXT: SONG NAME/ARTIST received :thumbsup: 2 :thumbsdown: 0 :heart: 0 
-// TODO: When a user joins the DJs, reset Lunch/Meeting breaks.
-// NEXT: SONG BAN LIST
-
-/*
-turntable.sendMessage({
-			"api": "pm.send", 
-			"receiverid": userid, 
-			"text": msg.toString()
-			});
-turntable.sendMessage({"api": "pm.send", "receiverid": "6047879a47c69b001bdbcd9c", "text": "Dude".toString()});
-
-So, you work for a company that delivers gravel now? Do you know anything about gravel pricing? The reason I ask is  I had a "friend" tell me he could get me a good deal on some gravel for my drive so I when ahead with it. Now, I fear it wasn't such a good deal, maybe not a bad deal, just not the "good" deal I thought I was getting.
-
-
-
-You sent June 28, 2019
-If you know pricing would you be able to answer these questions?
-How much should a ton of 57 gravel be? 
-What's your delivery charge per load? 
-How many tons per load?
-
-Kristi sent June 28, 2019
-The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons)
-You sent June 28, 2019
-So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
-
-Kristi sent June 28, 2019
-They stopped doing residential. Anything over 10 ton we will deliver , so yes we can do that.  It would be about $50 per load for delivery and they do up to 20tons per load.
-
-
-STALKER COMMANDS: 
--- Last Activity:
-	afktime @DemNutzzzz
-*/
-// :cherries: :pineapple: :banana: :eggplant: :peach: :melon: 
-/*	Three Mellon	500
-	Three Peach		100
-	Three Eggplant	50
-	Three Banana	20
-	Three Pineapple	15
-	Three cherries	10
-	cherry-cherry-any	5
-	cherry-any-any	2
-
-	C=Cherry	5	2	3
-	A=Pineapple	4	4	4
-	B=Banana	3	4	4
-	M=Mellon	1	1	1
-	E=Eggplant	3	3	1
-	L=Lemon		3	5	6
-	P=Peach		1	1	1
-	Total		20	20	20
-	slotCommand:
-*/
-//SECTION SLOTS: Slot machine game!
-//SECTION MyCOMMENTS: All comments:
-//SECTION SETTINGS: All local settings:
-//SECTION UTIL: Core functionality: MyUTIL.
-//SECTION API: Site specific code: MyAPI. ALL Platform dependant code goes
-//SECTION BotEVENTS: Events call from host:
-//SECTION USERS: All User data
-//SECTION MyROOM: All room settings:
-//SECTION WAITLIST: Manage the waitlist:
-//SECTION AFK:
-//SECTION CHAT:
-//SECTION COMMANDS: All Bot commands - The bot commands / meat:
-//SECTION PERM: User roles/permissions
-//SECTION STORAGE: Store & Load settings/users/banlist etc.
-//SECTION STARTUP: Init code:
-/*
-
-var map = new Map();
-map.set('name', 'John');
-map.set('id', 11);
-
-// Get the full content of the Map
-console.log(map); // Map { 'name' => 'John', 'id' => 11 }
-Get value of the Map using key
-
-var map = new Map();
-map.set('name', 'John');
-map.set('id', 11);
-console.log(map.get('name')); // John 
-console.log(map.get('id')); // 11
-JSON.stringify(map);
-
-Larry Top Roll Percentages: [:one: StormeCrow 31/50 62.00%] [:two: twizted_smilee 71/126 56.35%] [:three: Gringo Starr 104/186 55.91%] [:four: WhiteWidow 27/50 54.00%] [:five: TLD 104/186 55.91%]
-Larry [:six: given2fly 210/422 49.76%] [:seven: DeezNutzzzz 360/727 49.52%] [:eight: DocZ 463/940 49.26%] [:nine: Balloon Knot 171/350 48.86%] [
-The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons) So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
-
-
-*/
