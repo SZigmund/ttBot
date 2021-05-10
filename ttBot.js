@@ -2,7 +2,7 @@
 
 //SECTION SLOTS: Slot machine game!  // http://edspi31415.blogspot.com/2014/01/probability-odds-of-winning-at-slot.html
 var SLOTS = {
-	wheel1: "CCCLLBBBEEELLLMPAAAA",
+	wheel1: "CCCCLBBBEEELLLMPAAAA",
 	wheel2: "CCBBBBEEELLLLLMPAAAA",
 	wheel3: "CCCBBBBELLLLLLMPAAAA",
     DOY: -1,
@@ -10,7 +10,7 @@ var SLOTS = {
 	maxBetsPerDay: 10,
 	minBetsPerSpin: 100,
 	maxBetsPerSpin: 1000,
-	privateSlotsMode: true,   //Set to always PM all rolls and responses
+	privateSlotsMode: false,   //Set to always PM all rolls and responses (This was used for initial testing)
 	Players: [], // .push(new USERS.User(user.id, user.username));
     slotPlayer: function(uid, DOY) {
       this.uid = uid;
@@ -37,7 +37,7 @@ var SLOTS = {
 	  //After reporting issues, force to be in chat if not set to private mode:
 	  chat.type = (SLOTS.privateSlotsMode === true) ? chat.type : 'chat';
 	  var mySpin =  SLOTS.spinTheWheel();
-	  SLOTS.displaySpin(chat, mySpin);
+	  SLOTS.displaySpin(chat, mySpin, bet);
 	  var payout =  SLOTS.calculatePayout(mySpin, bet);
 	  player = SLOTS.updatePlayerStats(player, payout, bet);
 	  SLOTS.reportPayout(chat, payout, player);
@@ -79,9 +79,10 @@ var SLOTS = {
 	}
     catch (err) {	console.log("SLOTS.createPlayer: " + err.message); }
   },
-  displaySpin: function(chat, mySpin) {
+  displaySpin: function(chat, mySpin, bet) {
     try {
-		var msg = SLOTS.letterToFruit(mySpin.substring(0,1)) + ' ';
+		var msg = '$' + bet.toString() + ': ';
+		msg += SLOTS.letterToFruit(mySpin.substring(0,1)) + ' ';
 		msg += SLOTS.letterToFruit(mySpin.substring(1,2)) + ' ';
 		msg += SLOTS.letterToFruit(mySpin.substring(2,3));
 		MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
@@ -115,6 +116,7 @@ var SLOTS = {
   getPlayer: function(uid) {
     try {
 	  var results = -1;
+	  if (SLOTS.Players === null) return results;
 	  SLOTS.Players.forEach(player => { if (player.uid == uid) results = player; });
 	  return results;
 	}
@@ -3751,7 +3753,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substr(cmd.length + 2);
+        var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (msg.length > cmd.length + 2) {
           if (typeof user !== 'undefined') {
@@ -3905,7 +3907,7 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         //if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
         if (msg.length === cmd.length) return (0);
-        var name = msg.substring(cmd.length + 2);
+        var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -3928,7 +3930,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substring(cmd.length + 2);
+        var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -3954,7 +3956,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substring(cmd.length + 2);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -4011,7 +4013,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substr(cmd.length + 2);
+        var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -4319,7 +4321,7 @@ var BOTCOMMANDS = {
         var name;
         if (msg.length === cmd.length) name = chat.un;
         else {
-          name = msg.substring(cmd.length + 2);
+		  name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var perm = USERS.getPermission(chat.uid);
           if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.dclookuprank, {
             name: chat.un
@@ -4345,7 +4347,7 @@ var BOTCOMMANDS = {
   //         else {
   //             var msg = chat.message;
   //             if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
-  //             var name = msg.substring(cmd.length + 2);
+  //             var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
   //             var user = USERS.lookupLocalUser(name);
   //             if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {name: chat.un}));
   //             var chats = $('.from');
@@ -4390,7 +4392,7 @@ var BOTCOMMANDS = {
         var name;
         if (msg.length > cmd.length) {
           if (perm < PERM.ROLE.BOUNCER) return void(0);
-          name = msg.substring(cmd.length + 2);
+		  name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         } else name = chat.un;
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
@@ -4464,7 +4466,7 @@ var BOTCOMMANDS = {
         var name;
         if (msg.length === cmd.length) name = chat.un;
         else {
-          name = msg.substr(cmd.length + 2);
+		  name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         }
         var user = USERS.lookupLocalUser(name);
         if (user === false || !user.inRoom) {
@@ -4612,7 +4614,7 @@ var BOTCOMMANDS = {
       var byusername = " ";
       if (msg.length === cmd.length) name = chat.un;
       else {
-        name = msg.substring(cmd.length + 2);
+		name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var perm = USERS.getPermission(chat.uid);
         if (perm < PERM.ROLE.BOUNCER) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bootrank, {
           name: chat.un
@@ -4670,7 +4672,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substring(cmd.length + 2);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (typeof user === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -4701,7 +4703,7 @@ var BOTCOMMANDS = {
         var name;
         if (lastSpace === msg.indexOf(' ')) {
           time = 0.25;
-          name = msg.substring(cmd.length + 2);
+          name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         } else {
           time = msg.substring(lastSpace + 1);
           name = msg.substring(cmd.length + 2, lastSpace);
@@ -5104,7 +5106,7 @@ var BOTCOMMANDS = {
         var name;
         if (isNaN(parseInt(msg.substring(lastSpace + 1)))) {
           pos = 1;
-          name = msg.substring(cmd.length + 2);
+          name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         } else {
           pos = parseInt(msg.substring(lastSpace + 1));
           name = msg.substring(cmd.length + 2, lastSpace);
@@ -5144,7 +5146,7 @@ var BOTCOMMANDS = {
         var time = null;
         var name;
         if (lastSpace === msg.indexOf(' ')) {
-          name = msg.substring(cmd.length + 2);
+          name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           time = 45;
         } else {
           time = msg.substring(lastSpace + 1);
@@ -5330,7 +5332,7 @@ var BOTCOMMANDS = {
       else {
         var msg = chat.message;
         if (msg.length > cmd.length + 2) {
-          var name = msg.substr(cmd.length + 2);
+		  var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var user = USERS.lookupLocalUser(name);
           if (typeof user !== 'boolean') {
             USERS.resetDC(user);
@@ -5673,7 +5675,7 @@ var BOTCOMMANDS = {
         if (msg.length === cmd.length) return MyUTIL.logInfo(CHAT.subChat(CHAT.chatMapping.nouserspecified, {
           name: chat.un
         }));
-        var name = msg.substr(cmd.length + 2);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         var msg = "";
         if (user === false) {
@@ -6173,7 +6175,7 @@ var BOTCOMMANDS = {
         setTimeout(function(chat) {
           var msg = chat.message;
           if (msg.length === cmd.length) return MyUTIL.sendChat();
-          var name = msg.substring(cmd.length + 2);
+          var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var bannedUsers = MyAPI.getBannedUsers();
           var found = false;
           var bannedUser = null;
@@ -6231,7 +6233,7 @@ var BOTCOMMANDS = {
         //     else return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.unmuteeveryonerank, {name: chat.un}));
         // }
         var from = chat.un;
-        var name = msg.substr(cmd.length + 2);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
 
         var user = USERS.lookupLocalUser(name);
 
@@ -6330,7 +6332,7 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         var name = "";
         if (msg.length === cmd.length) name = chat.un
-        else name = msg.substring(cmd.length + 2);
+        else name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (user === false) return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -6364,7 +6366,7 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         var name = "";
         if (msg.length === cmd.length) name = chat.un
-        else name = msg.substring(cmd.length + 2);
+        else name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var user = USERS.lookupLocalUser(name);
         if (user === false) return MyUTIL.logChat(CHAT.subChat(CHAT.chatMapping.invaliduserspecified, {
           name: chat.un
@@ -6423,9 +6425,9 @@ var BOTCOMMANDS = {
     }
   },
 
-//TODER: TEST echo2chat customCommand randomCommand 
+//TODER: TEST echo2chat customCommand randomCommand
   echoCommand: { //Added 01/27/2015 Zig
-    command: ['echo','echo2chat'],
+    command: ['echo','echo2chat','echo2pm'],
     rank: 'manager',
     type: 'startsWith',
     functionality: function(chat, cmd) {
@@ -6534,7 +6536,7 @@ var BOTCOMMANDS = {
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         else {
           if (chat.message.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me No user specified.');
-          var name = chat.message.substring(cmd.length + 2);
+		  var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var roomUser = USERS.lookupLocalUser(name);
           if (typeof roomUser === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me Invalid user specified.');
           var lang = MyAPI.getChatRoomUser(roomUser.id).language;
@@ -6639,7 +6641,7 @@ var BOTCOMMANDS = {
         setTimeout(function(chat) {
           var msg = chat.message;
           if (msg.length === cmd.length) return MyUTIL.sendChat();
-          var name = msg.substring(cmd.length + 2);
+          var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var bannedUsers = MyAPI.getBannedUsers();
           var found = false;
           var bannedUser = null;
@@ -6782,7 +6784,7 @@ var BOTCOMMANDS = {
         var byusername = " ";
         if (msg.length === cmd.length) name = chat.un;
         else {
-          name = msg.substring(cmd.length + 2);
+          name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var perm = USERS.getPermission(chat.uid);
           if (perm < PERM.ROLE.BOUNCER) 
 		    return MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.bootrank, { name: chat.un }));
@@ -6991,7 +6993,7 @@ var BOTCOMMANDS = {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         if (chat.message.length === cmd.length) return MyUTIL.sendChatOrPM(chat.type, chat.uid, '/me No user specified.');
-        var name = chat.message.substring(cmd.length + 2);
+		var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var roomUser = USERS.lookupLocalUser(name);
         if (typeof roomUser === 'boolean') return MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Invalid user specified.');
         var msgSend = "@" + roomUser.username + ": If you find yourself Meh-ing most songs, this isn't the room for you. Serial Meh'ers will be banned. If you don't like the music find a different room please.";
@@ -7110,7 +7112,7 @@ var BOTCOMMANDS = {
         else {
 
           if (chat.message.length === cmd.length) return MyUTIL.logChat('/me No user specified.');
-          var name = chat.message.substring(cmd.length + 2);
+		  var name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
           var roomUser = USERS.lookupLocalUser(name);
           if (typeof roomUser === 'boolean') return MyUTIL.logChat('/me Invalid user specified.');
           var resetDebug = false;
@@ -7350,7 +7352,7 @@ var BOTCOMMANDS = {
   //                        if (!BOTCOMMANDS.executable(this.rank, chat)) return void (0);
   //                        var msg = chat.message;
   //                        if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.nouserspecified, {name: chat.un}));
-  //                        var whoisuser = msg.substr(cmd.length + 2);
+  //                        var whoisuser = MyUTIL.defineCommandExecuteOnName(chat, cmd);
   //                        MyUTIL.logDebug("whois: " + whoisuser);
   //                        var user;
   //                        if (isNaN(whoisuser)) user = USERS.lookupLocalUser(whoisuser);
@@ -7378,7 +7380,7 @@ var BOTCOMMANDS = {
         var msg = chat.message;
         var name;
         if (msg.length === cmd.length) name = chat.un;
-        else name = msg.substr(cmd.length + 2);
+        else name = MyUTIL.defineCommandExecuteOnName(chat, cmd);
         var whoismsg = MyAPI.whoisinfo(chat.un, name);
         if (whoismsg.length > 0) MyUTIL.sendChat(whoismsg);
       }
@@ -7780,3 +7782,117 @@ if (!window.APIisRunning) {
 } else {
   setTimeout(function() {STARTUP.initbot();}, 1000);
 };
+
+/*
+var e = turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "Dude".toString()});
+turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "TEST"});
+*/
+// Log all skip songs, Dj Removals, skipsong
+/*
+      	  setTimeout(function() { MyUTIL.skipSong(false); }, 500);
+      	  setTimeout(function() { MyUTIL.removeDJ(bootuser.id); }, 1000);
+*/
+
+// TESTING: DJ Waitlist ****  Issues with 
+// DONE: BotSnag grabsong
+// DONE: User split
+// DONE: SONG TOO LONG
+// DONE: SONG IN HIST
+// DONE: AFK DJ 
+// DONE: ImOut
+// DONE: Bot DJ
+
+// NEXT: THEME/GENRE  - No EDM or Kiddie songs.
+// NEXT: SONG NAME/ARTIST received :thumbsup: 2 :thumbsdown: 0 :heart: 0 
+// TODO: When a user joins the DJs, reset Lunch/Meeting breaks.
+// NEXT: SONG BAN LIST
+
+/*
+turntable.sendMessage({
+			"api": "pm.send", 
+			"receiverid": userid, 
+			"text": msg.toString()
+			});
+turntable.sendMessage({"api": "pm.send", "receiverid": "6047879a47c69b001bdbcd9c", "text": "Dude".toString()});
+
+So, you work for a company that delivers gravel now? Do you know anything about gravel pricing? The reason I ask is  I had a "friend" tell me he could get me a good deal on some gravel for my drive so I when ahead with it. Now, I fear it wasn't such a good deal, maybe not a bad deal, just not the "good" deal I thought I was getting.
+
+
+
+You sent June 28, 2019
+If you know pricing would you be able to answer these questions?
+How much should a ton of 57 gravel be? 
+What's your delivery charge per load? 
+How many tons per load?
+
+Kristi sent June 28, 2019
+The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons)
+You sent June 28, 2019
+So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
+
+Kristi sent June 28, 2019
+They stopped doing residential. Anything over 10 ton we will deliver , so yes we can do that.  It would be about $50 per load for delivery and they do up to 20tons per load.
+
+
+STALKER COMMANDS: 
+-- Last Activity:
+	afktime @DemNutzzzz
+*/
+// :cherries: :pineapple: :banana: :eggplant: :peach: :melon: 
+/*	Three Mellon	500
+	Three Peach		100
+	Three Eggplant	50
+	Three Banana	20
+	Three Pineapple	15
+	Three cherries	10
+	cherry-cherry-any	5
+	cherry-any-any	2
+
+	C=Cherry	5	2	3
+	A=Pineapple	4	4	4
+	B=Banana	3	4	4
+	M=Mellon	1	1	1
+	E=Eggplant	3	3	1
+	L=Lemon		3	5	6
+	P=Peach		1	1	1
+	Total		20	20	20
+	slotCommand:
+*/
+//SECTION SLOTS: Slot machine game!
+//SECTION MyCOMMENTS: All comments:
+//SECTION SETTINGS: All local settings:
+//SECTION UTIL: Core functionality: MyUTIL.
+//SECTION API: Site specific code: MyAPI. ALL Platform dependant code goes
+//SECTION BotEVENTS: Events call from host:
+//SECTION USERS: All User data
+//SECTION MyROOM: All room settings:
+//SECTION WAITLIST: Manage the waitlist:
+//SECTION AFK:
+//SECTION CHAT:
+//SECTION COMMANDS: All Bot commands - The bot commands / meat:
+//SECTION PERM: User roles/permissions
+//SECTION STORAGE: Store & Load settings/users/banlist etc.
+//SECTION STARTUP: Init code:
+/*
+
+var map = new Map();
+map.set('name', 'John');
+map.set('id', 11);
+
+// Get the full content of the Map
+console.log(map); // Map { 'name' => 'John', 'id' => 11 }
+Get value of the Map using key
+
+var map = new Map();
+map.set('name', 'John');
+map.set('id', 11);
+console.log(map.get('name')); // John 
+console.log(map.get('id')); // 11
+JSON.stringify(map);
+
+Larry Top Roll Percentages: [:one: StormeCrow 31/50 62.00%] [:two: twizted_smilee 71/126 56.35%] [:three: Gringo Starr 104/186 55.91%] [:four: WhiteWidow 27/50 54.00%] [:five: TLD 104/186 55.91%]
+Larry [:six: given2fly 210/422 49.76%] [:seven: DeezNutzzzz 360/727 49.52%] [:eight: DocZ 463/940 49.26%] [:nine: Balloon Knot 171/350 48.86%] [
+The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons) So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
+
+
+*/
