@@ -1329,9 +1329,9 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
     try {
 	  MyUTIL.logInfo(MyUTIL.formatDate(Date.now()));
 	  if (turntable.buddyList.room.volumePercentage > 1.0)
-	    turntable.buddyList.room.volumePercentage = 1.5;
+	    turntable.buddyList.room.volumePercentage = 0.20;
 	  else
-	  turntable.buddyList.room.volumePercentage = 0.20;
+		turntable.buddyList.room.volumePercentage = 1.5;
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.botKeepAlive2: " + err.message); }
   },
