@@ -28,10 +28,11 @@ var SLOTS = {
     },
 
   playSlots: function(bet, chat) {
-    try			{
-	  //if (!MyUTIL.IsTestBot(chat.uid)) return;  //TODOERERER REMOVE THIS
-	  //if (MyUTIL.IsClubDeez()) return;			//TODOERERER REMOVE THIS
-	  if (SLOTS.slotsDisabled === true) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slots are currently disabled. Why not go outside for a bit.");
+    try {
+	  if (SLOTS.slotsDisabled === true) { 
+	    MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slots are currently disabled. Why not go outside for a bit.");
+		return;
+	  }
 	  if (SLOTS.getPlayer(chat.uid) === -1) SLOTS.createPlayer(chat);
 	  var player =	SLOTS.getPlayer(chat.uid);
 	  player = SLOTS.addDailyCash(player);
