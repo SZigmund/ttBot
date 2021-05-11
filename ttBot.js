@@ -10,6 +10,7 @@ var SLOTS = {
 	maxBetsPerDay: 10,
 	minBetsPerSpin: 100,
 	maxBetsPerSpin: 1000,
+	slotsDisabled: false,
 	privateSlotsMode: false,   //Set to always PM all rolls and responses (This was used for initial testing)
 	Players: [], // .push(new USERS.User(user.id, user.username));
     slotPlayer: function(uid, DOY) {
@@ -30,6 +31,7 @@ var SLOTS = {
     try			{
 	  //if (!MyUTIL.IsTestBot(chat.uid)) return;  //TODOERERER REMOVE THIS
 	  //if (MyUTIL.IsClubDeez()) return;			//TODOERERER REMOVE THIS
+	  if (SLOTS.slotsDisabled === true) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slots are currently disabled. Why not go outside for a bit.");
 	  if (SLOTS.getPlayer(chat.uid) === -1) SLOTS.createPlayer(chat);
 	  var player =	SLOTS.getPlayer(chat.uid);
 	  player = SLOTS.addDailyCash(player);
@@ -48,16 +50,15 @@ var SLOTS = {
   addDailyCash: function(player) {
     try {
       if (player.DOYLastPlay !== MyUTIL.getDOY()) {
-		player.DOYLastPlay == MyUTIL.getDOY();
+		player.DOYLastPlay = MyUTIL.getDOY();
 		player.balance += SLOTS.dailyIncrease;
 		player.dailyWages += SLOTS.dailyIncrease;
 		player.dailyBets = 0;
-		return player;
 	  }
 	  return player;
-    } 
+    }
 	catch (err) { MyUTIL.logException("SLOTS.addDailyCash: " + err.message);
-      return "";
+    return player;
     }
   },
   calculatePayout: function(mySpin, bet) {
@@ -193,6 +194,7 @@ var SLOTS = {
 	  player.cashWon += (payout > 0) ? (payout - bet) : 0;
 	  player.cashLoss += (payout > 0) ? 0 : bet;
 	  player.dailyBets += 1;
+	  player.DOYLastPlay = MyUTIL.getDOY();
 	  return player;
 	}
     catch (err) {	console.log("SLOTS.displaySpin: " + err.message); }
