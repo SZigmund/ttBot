@@ -52,6 +52,7 @@ var SLOTS = {
 		player.balance += SLOTS.dailyIncrease;
 		player.dailyWages += SLOTS.dailyIncrease;
 		player.dailyBets = 0;
+		return player;
 	  }
 	  return player;
     } 
