@@ -129,7 +129,7 @@ var SLOTS = {
     try {
   	  var validBet = false;
 	  if (bet > player.balance) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Bet exceeds available balance: $" + player.balance);
-	  if (player.dailyBets >= SLOTS.maxBetsPerDay) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slot max daily plays: " + SLOTS.maxBetsPerDay);
+	  else if (player.dailyBets >= SLOTS.maxBetsPerDay) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Slot max daily plays: " + SLOTS.maxBetsPerDay);
 	  else if (bet > SLOTS.maxBetsPerSpin) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Maximum bet: $" + SLOTS.maxBetsPerSpin);
 	  else if (bet < SLOTS.minBetsPerSpin) MyUTIL.sendChatOrPM(chat.type, chat.uid, "Minimum bet: $" + SLOTS.minBetsPerSpin);
 	  else validBet = true;
