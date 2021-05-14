@@ -207,7 +207,10 @@ var SLOTS = {
 	            MyUTIL.formatPercentage(player.winCount, (player.winCount + player.lossCount), 0) + ']'
 	  MyUTIL.sendChatOrPM(chat.type, chat.uid, msg);
 	  setTimeout(function () { 
-	   MyUTIL.sendChatOrPM(chat.type, chat.uid, '[Bets: $' + player.cashBet + '] [Winnings: $' + player.cashWon + '][Losses: $' +  player.cashLoss + ']'); }, 250);
+	   MyUTIL.sendChatOrPM(chat.type, chat.uid, '[Bets: ' + MyUTIL.formatCurrency(player.cashBet, 0) + ']' + 
+	                                            ' [Winnings: ' + MyUTIL.formatCurrency(player.cashWon, 0) + ']' + 
+												' [Losses: ' +  MyUTIL.formatCurrency(player.cashLoss, 0) + ']' +
+												' [Plays: ' + (SLOTS.maxBetsPerDay - player.dailyBets) + ']'); }, 250);
 	}
     catch (err) {	console.log("SLOTS.slotStats: " + err.message); }
   },
@@ -6804,12 +6807,6 @@ var BOTCOMMANDS = {
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
         var leaderBoard = SLOTS.slotLeaders(true);
         USERS.displayLeaderBoardNEW(leaderBoard, chat, false, "Rich Slot Players: ");
-		if (leaderBoard.length === 2) {
-		  USERS.displayLeaderBoardNEW(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoardNEW(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoardNEW(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoardNEW(leaderBoard, chat, false, "");
-		}
       } 
 	  catch (err) { MyUTIL.logException("slotwinnersCommand: " + err.message); }
     }
@@ -7296,13 +7293,6 @@ var BOTCOMMANDS = {
         }
         var leaderBoard = USERS.loadRollPct(true, requiredRolls);
         USERS.displayLeaderBoard(leaderBoard, chat, true, "Top Roll Percentages: ");
-		if (leaderBoard.length === 2) {
-			USERS.displayLeaderBoard(leaderBoard, chat, true, "");
-			USERS.displayLeaderBoard(leaderBoard, chat, true, "");
-			USERS.displayLeaderBoard(leaderBoard, chat, true, "");
-			USERS.displayLeaderBoard(leaderBoard, chat, true, "");
-		}
-		
       } catch (err) {
         MyUTIL.logException("rollpct: " + err.message);
       }
@@ -7324,15 +7314,8 @@ var BOTCOMMANDS = {
         }
         var leaderBoard = USERS.loadRollPoints(true, requiredRolls);
         USERS.displayLeaderBoard(leaderBoard, chat, false, "Top Roll Points: ");
-		if (leaderBoard.length === 2) {
-		  USERS.displayLeaderBoard(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoard(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoard(leaderBoard, chat, false, "");
-		  USERS.displayLeaderBoard(leaderBoard, chat, false, "");
-		}
-      } catch (err) {
-        MyUTIL.logException("rollpts: " + err.message);
-      }
+      } 
+	  catch (err) { MyUTIL.logException("rollpts: " + err.message); }
     }
   },
   nsfwCommand: { //Added 04/22/2015 Zig
