@@ -1,5 +1,3 @@
-//4967.33
-
 //SECTION SLOTS: Slot machine game!  // http://edspi31415.blogspot.com/2014/01/probability-odds-of-winning-at-slot.html
 var SLOTS = {
 	wheel1: "CCCCLBBBEEELLLMPAAAA",
@@ -1296,7 +1294,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
         'hawt', 'extreme', 'dude', 'babes', 'fun', 'reggae', 'party', 'drums', 'trumpet', 'mosh', 'bang', 'blues', 'heart', 'feels', 'dope', 'makeitrain', 'wumbo',
         'firstclass', 'firstrate', 'topnotch', 'aweinspiring', 'superduper', 'dabomb', 'dashit', 'badass', 'bomb', 'popcorn', 'awesomesauce', 'awesomeness', 'sick',
         'sexy', 'brilliant', 'steampunk', 'bagpipes', 'piccolo', 'whee', 'vibe', 'banjo', 'harmony', 'harmonica', 'flute', 'dancing', 'dancin', 'ducky', 'approval', 'winning', 'okay',
-        'hunkydory', 'peach', 'divine', 'radiant', 'sublime', 'refined', 'foxy', 'allskate', 'rush', 'boston', 'murica', '2fer', 'boom', 'bitches', 'oar', 'hipster',
+        'hunkydory', 'peach', 'divine', 'radiant', 'sublime', 'refined', 'foxy', 'allskate', 'couplesskate', 'coupleskate', 'rush', 'boston', 'murica', '2fer', 'boom', 'bitches', 'oar', 'hipster',
         'hip', 'soul', 'soulful', 'cover', 'yummy', 'ohyeah', 'twist', 'shout', 'trippy', 'hot', 'country', 'stellar', 'smoove', 'pantydropper', 'baby', 'mmm', 'hooters',
         'tmbg', 'rhythm', 'kool', 'kewl', 'killer', 'biatch', 'woodblock', 'morecowbell', 'lesbian', 'lesbians', 'niceconnect', 'connect', 'kazoo', 'win', 'webejammin',
         'bellyrub', 'groove', 'gold', 'golden', 'twofer', 'phat', 'punkrock', 'punkrocker', 'merp', 'derp', 'herp-a-derp', 'narf', 'amazing', 'doabarrellroll', 'plusone',
@@ -1317,7 +1315,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
         'off the chain', 'off the hook', 'out of sight', 'peachy keen', 'peachy-keen', 'offdahook', 'offthechain', 'offthehook', 'outofsight',
         'peachykeen', 'perf', 'phatness', 'phenom', 'prime-time', 'primo', 'rad', 'radical', 'rage', 'rancid', 'random', 'nice cover', 'nicecover', 'raw',
         'redonkulus', 'righteous', 'rocking', 'rock-solid', 'rollin', '3fer', '4fer', 'threefer', 'fourfer', 'nice2fer', 'amazeballs', 'craycray',
-        '5fer', '6fer', '7fer', '8fer', '9fer', '10fer', '11fer', '12fer',
+        '5fer', '6fer', '7fer', '8fer', '9fer', '10fer', '11fer', '12fer', '13fer', '14fer', '15fer', '16fer', '17fer', '18fer', '19fer', '20fer',
         'whizzbang', 'a1', 'aok', 'asskicking', 'bombass', 'fanfuckingtastic', 'primetime', 'rocksolid', 'instrumental', 'rockin', ':star:', 'star', 'rockstar', ':metal:',
         '10s', '00s', '90s', '80s', '70s', '60s', '50s', '40s', '30s', '20s', 'insane', 'clever', ':heart:', ':heart_decoration:', ':heart_eyes:', ':heart_eyes_cat:', ':heartbeat:',
         ':heartpulse:', ':hearts:', ':yellow_heart:', ':green_heart:', ':two_hearts:', ':revolving_hearts:', ':sparkling_heart:', ':blue_heart:', 'giddyup', 'rockabilly',
@@ -1340,7 +1338,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
         'osfleftovers', 'osf', 'beard', 'dowop', 'productivitykiller', 'heyman', '420osf', 'osf420', 'twss', 'outfuckingstanding', 'modernspiritual', 'amodernspiritual',
         'realreggae', 'dadada', 'lalala', 'casio', 'joy', 'sunshine', 'whiledeezisaway', 'unintentional2fer', 'manbunhipsterstachepunchableface', 'taco',
         'tacos', 'faketastypoint', 'groovin', 'rollreminder', 'phishingforatastypoint', 'hipstermanbunpunchablefacestache','bnl','jewishamericanreggaerapperbeatboxer','magic',
-        'makemefries','mankiss','copasetic','bluesy','hoochiemama','fightingtrousers'
+        'makemefries','mankiss','copasetic','bluesy','hoochiemama','fightingtrousers','gdright','dailyplay','fistpump','manbunhipsterpunchableface',':peach:'
       ];
       // If a command if passed in validate it and return true if it is a Tasty command:
       if (cmd.length > 0) {
@@ -1373,10 +1371,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
   botKeepAlive2: function() {
     try {
 	  MyUTIL.logInfo(MyUTIL.formatDate(Date.now()));
-	  if (turntable.buddyList.room.volumePercentage > 1.0)
-	    turntable.buddyList.room.volumePercentage = 0.20;
-	  else
-		turntable.buddyList.room.volumePercentage = 1.5;
+	  MyAPI.updatePresence();
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.botKeepAlive2: " + err.message); }
   },
@@ -2160,7 +2155,6 @@ var MyAPI = {
 	}
 	catch (err) { MyUTIL.logException("MyAPI.getSongHistory: " + err.message); }
   },
-
 	//Song History:
 	//turntable.buddyList.room.roomData.metadata.songlog.length
 	//turntable.buddyList.room.roomData.metadata.songlog[38] (40 is too high, 39 is curent song)
@@ -2483,6 +2477,13 @@ var MyAPI = {
 	catch (err) { MyUTIL.logException("MyAPI.MonitorMessages: " + err.message); }
   },
 
+  playlistChange: function(playlistname) {
+    try { 
+		turntable.sendMessage( { api: "playlist.switch", playlist_name: playlistname }); 
+	}
+	catch (err) { MyUTIL.logException("MyAPI.playlistChange: " + err.message);	}
+  },
+
   //DO NOT CALL DIRECTLY, use: MyUTIL.removeDJ(...
   RemoveDJ: function(userid) {
 	try	{
@@ -2538,6 +2539,11 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
     try 		{ turntable.sendMessage({"api": "user.set_bot"}); 			} 
 	catch (err) { MyUTIL.logException("MyAPI.RegisterAsBot: " + err.message);	}
   },
+  setVolume: function(volume) {
+    try 		{ turntable.buddyList.room.volumePercentage = volume; 		} 
+	catch (err) { MyUTIL.logException("MyAPI.setVolume: " + err.message);	}
+  },
+	  
   SkipSong: function() {
     try {
 		//TRY: roomManagerCallback: function(e, i) {
@@ -2551,7 +2557,11 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
     } 
 	catch (err) { MyUTIL.logException("MyAPI.SkipSong: " + err.message); }
   },
-  userInDjList: function(uid) {
+  updatePresence: function() {
+    try 		{ turntable.sendMessage({api: "presence.update", status: "available"}); 			} 
+	catch (err) { MyUTIL.logException("MyAPI.updatePresence: " + err.message);	}
+  },
+  userInDjList: function(uid) {  //  isOnDeck
     try {
 	  return (turntable.buddyList.room.djids.indexOf(uid) > -1)
 	  //turntable.buddyList.room.djids.indexOf("6047879a47c69b001bdbcd9c") 
@@ -2569,9 +2579,7 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
 	catch (err) { MyUTIL.logException("MyAPI.userInRoom: " + err.message); }
   },
   UserLanguage: function(userid) {
-    try {
-		return "EN";
-    } 
+    try { return "EN";    } 
 	catch (err) { MyUTIL.logException("MyAPI.UserLanguage: " + err.message); }
   },
   VoteForSong: function(voteOpt) {
@@ -2638,6 +2646,7 @@ var BotEVENTS = {
     try{
       MyUTIL.logDebug("DJ LIST UPDATE");
 	  MyUTIL.booth.checkForDisconnect();
+	  if (!WAITLIST.ValidateNewDJ()) return;    // Make sure the correct DJ hopped up.
 	  WAITLIST.QNextDJFromWaitlist();
       //MyUTIL.booth.checkForReconnect();
 	}
@@ -3391,28 +3400,39 @@ var MyROOM = {
 
 //SECTION WAITLIST: Manage the waitlist:
 var WAITLIST = {
-  waitingOnDj: false,
-  maxDJCount: 5,			//Number of djs we can have playing at a time
-  waitlistEnabled: true,
+  enableWaitlist: true,
+  enableFastStart: true,
+  enablePoliceHopUps: true,
+  lastDjInvite: Date.now(),
+  maxDJCount: 5,			//Number of djs we can have playing at a time (Mostly for testing)
+  waitingOnDjId: "",
 
   // called when a user requests to get added to the wailist: (Called from addmecommand) chat
   addToWaitlist: function(chat) {
     try {
-		if (WAITLIST.waitlistEnabled === false) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "DJ Waitlist is currently disabled."); return; }
-		if (MyAPI.userInDjList(chat.uid)) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "Cannot join waitlist, you are already djing." + chat.un); return; }
+		if (WAITLIST.enableWaitlist === false) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "DJ Waitlist is currently disabled."); return; }
+		if (MyAPI.userInDjList(chat.uid)) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "Cannot join waitlist, you are already djing " + chat.un); return; }
 		if (MyROOM.queue.id.indexOf(chat.uid) > -1) { MyUTIL.sendChatOrPM(chat.type, chat.uid, "/me " + chat.un + " you are already on the waitlist. (Position:  " + (MyROOM.queue.id.indexOf(chat.uid) + 1).toString() + ")");  return; }
-		if ((MyAPI.djCount() < WAITLIST.maxDJCount) && (!WAITLIST.waitingOnDj)) return MyUTIL.sendChat("No waiting, hop up now " + chat.un);
-        if (MyROOM.queue.id.indexOf(chat.uid) === -1) { MyROOM.queue.id.push(chat.uid); }
+		if ((MyAPI.djCount() < WAITLIST.maxDJCount) && (WAITLIST.waitingOnDjId === "")) return MyUTIL.sendChat("No waiting, hop up now " + chat.un);
+        if (MyROOM.queue.id.indexOf(chat.uid) === -1) { WAITLIST.addUser(chat.uid) }
 		STORAGE.storeToStorage();
 		MyUTIL.sendChat("/me " + chat.un + " you are currently number " + (MyROOM.queue.id.indexOf(chat.uid) + 1).toString() + " on the waitlist.");
+		WAITLIST.checkWaitlistFastStart();
 	}
 	catch (err) { MyUTIL.logException("WAITLIST.addToWaitlist: " + err.message); }
+  },
+  addUser: function(uid) {
+    try {
+		if (MyROOM.queue.id.indexOf(uid) > -1) return;
+		MyROOM.queue.id.push(uid);
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.addUser: " + err.message); }
   },
   // called after each song to see if we need to yank 1st dj and ping next
   checkWaitlistRemoval: function(lastplay) {
     try {
-      if (WAITLIST.waitlistEnabled === false) return;
-	  if (WAITLIST.waitingOnDj) return;				// Already waiting on a dj
+      if (WAITLIST.enableWaitlist === false) return;
+	  if (WAITLIST.waitingOnDjId !== "") return;				// Already waiting on a dj
 	  if (MyROOM.queue.id.length === 0) return;		// waitlist queue is empty
 	  if (MyAPI.djCount() < WAITLIST.maxDJCount) {
 		WAITLIST.QNextDJFromWaitlist();
@@ -3429,29 +3449,100 @@ var WAITLIST = {
 	}
 	catch (err) { MyUTIL.logException("WAITLIST.checkWaitlistRemoval: " + err.message); }
   },
+  // Removes the DJ at poleposition when any dj but #5 is spinning a song:
+  checkWaitlistFastStart: function() {
+    try {
+		if (WAITLIST.enableFastStart !== true) return;
+		MyUTIL.logInfo("WLLOG: 1");
+		var djlist = MyAPI.getDjList();
+		if (djlist.length < WAITLIST.maxDJCount) return; 	//No need for fast start we still have an open spot
+		MyUTIL.logInfo("WLLOG: 2");
+		if (MyAPI.CurrentDJID() === djlist[0].id) return;	//No need for fast start current DJ is at the pole position
+		MyUTIL.logInfo("WLLOG: 3");
+		if (MyAPI.CurrentDJID() === djlist[WAITLIST.maxDJCount - 1].id) return;	//No need for fast start current DJ is at the last position it will start soon enough
+		MyUTIL.logInfo("WLLOG: 4");
+		if (WAITLIST.isDJReady() === false) return;  //Everyone in the waitlist has either left the room or is already on deck.
+		MyUTIL.logInfo("WLLOG: 5");
+		MyUTIL.removeDJ(djlist[0].id, "Waitlist Fast Start");
+		MyUTIL.sendChat(djlist[0].username + " I've added you to the waitlist");
+		WAITLIST.addUser(djlist[0].id);
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.checkWaitlistFastStart: " + err.message); }
+  },
+  isDJReady: function() {  // Checks to ensure at least one user on the waitlist is in the room and not already on deck.
+    try {
+		var djReady = false;
+		MyROOM.queue.id.forEach(uid => { if (MyAPI.userInRoom(uid) && !MyAPI.userInDjList(uid)) djReady = true; });
+		return djReady;
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.isDJReady: " + err.message); }
+  },
   QNextDJFromWaitlist: function() {
     try {
-	  if (WAITLIST.waitlistEnabled === false) return;	//Waitlist disabled
+	  if (WAITLIST.enableWaitlist === false) return;	//Waitlist disabled
 	  if (MyROOM.queue.id.length === 0) return;			// waitlist queue is empty
-	  if (MyAPI.djCount() === WAITLIST.maxDJCount) { WAITLIST.waitingOnDj = false; return; }
-	  var nextDjId = MyROOM.queue.id[0];
-	  if (!MyAPI.userInRoom(nextDjId) || MyAPI.userInDjList(nextDjId)) {
+	  if (WAITLIST.waitingOnDjId !== "" &&  MyAPI.userInDjList(WAITLIST.waitingOnDjId)) {
+		  WAITLIST.waitingOnDjId = "";
+	  }
+	  if (WAITLIST.waitingOnDjId !== "") return;
+	  if (MyAPI.djCount() === WAITLIST.maxDJCount) { WAITLIST.checkWaitlistFastStart(); return; }
+	  var nextDjInQ = MyROOM.queue.id[0];
+	  if (!MyAPI.userInRoom(nextDjInQ) || MyAPI.userInDjList(nextDjInQ)) {
 		setTimeout(function() { WAITLIST.QNextDJFromWaitlist(); }, 250);
 	  }
 	  else {
-	    MyUTIL.sendChat("/me @" + MyAPI.getChatRoomUser(nextDjId).username + 
+	    WAITLIST.waitingOnDjId = nextDjInQ;
+		WAITLIST.lastDjInvite = Date.now(); //setLastActivity = :  user.getlastActivity =
+		MyUTIL.sendChat("/me @" + MyAPI.getChatRoomUser(nextDjInQ).username + 
 		  " you have 45 seconds to hop up. (Waiting: " + (MyROOM.queue.id.length - 1) + ")");
-	    WAITLIST.waitingOnDj = true;
-		setTimeout(function() { 
-		  WAITLIST.waitingOnDj = false; 	// Reset wait
-		  WAITLIST.QNextDJFromWaitlist();	// Check to see if they did jump up or if we still have an open spot
-		}, 45000);
+		// Check to see if they did jump up or if we still have an open spot
+		setTimeout(function() {  WAITLIST.QNextDJIfready();	 }, 45000);
 	  }
 	  MyROOM.queue.id.splice(0,1);  // Remove the top dj from the waitlist
 	  STORAGE.storeToStorage();
 	}
 	catch (err) { MyUTIL.logException("WAITLIST.QNextDJFromWaitlist: " + err.message); }
   },
+  QNextDJIfready: function() {
+    try {
+	  var lastInvite = Date.now() - WAITLIST.lastDjInvite;
+	  if (lastInvite > (44000)) WAITLIST.waitingOnDjId = "";
+	  if (lastInvite > (44000) || (WAITLIST.enableFastStart !== true)) WAITLIST.QNextDJFromWaitlist();
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.QNextDJIfready: " + err.message); }
+  },
+  RemoveLastDJToJoin: function() {
+    try {
+		var djlist = MyAPI.getDjList();
+		if (djlist.length < WAITLIST.maxDJCount) return;  //No need to remove the last one to hop up if we still have an open spot
+		var dj = djlist[WAITLIST.maxDJCount - 1];
+		MyUTIL.removeDJ(dj.id, "Waitlist - hopup wrong order.");
+		MyUTIL.sendChat("@" + dj.username + " it's not your turn, we're waiting for @" + 
+						MyAPI.getChatRoomUser(WAITLIST.waitingOnDjId).username + " to hop up.");
+		if (MyROOM.queue.id.indexOf(dj.id) < 0) WAITLIST.addUser(dj.id);
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.RemoveLastDJToJoin: " + err.message); }
+  },
+  ValidateNewDJ: function() {
+    try {
+		if (WAITLIST.enablePoliceHopUps === false) return true; 			// We don't police who hops up when we're waiting on a DJ
+		MyUTIL.logInfo("PLLOG: 1");
+		if (WAITLIST.waitingOnDjId === "") return true; 					// We're not waiting on a DJ so nothing to validate
+		MyUTIL.logInfo("PLLOG: 2");
+		if (MyAPI.djCount() != WAITLIST.maxDJCount) return true;	// Still a spot open for the DJ we are waiting on.
+		MyUTIL.logInfo("PLLOG: 3");
+		if (!MyAPI.userInRoom(WAITLIST.waitingOnDjId) || MyAPI.userInDjList(WAITLIST.waitingOnDjId)) {
+			WAITLIST.waitingOnDjId = "";
+			MyUTIL.logInfo("PLLOG: 4");
+			return true;  											//DJ hopped up or split
+		}
+		MyUTIL.logInfo("PLLOG: 5");
+		WAITLIST.RemoveLastDJToJoin();
+		return false;
+	}
+	catch (err) { MyUTIL.logException("WAITLIST.ValidateNewDJ: " + err.message); }
+  },
+  
 };
 
 //SECTION AFK:
@@ -6948,7 +7039,7 @@ var BOTCOMMANDS = {
       'hawt', 'extreme', 'dude', 'babes', 'fun', 'reggae', 'party', 'drums', 'trumpet', 'mosh', 'bang', 'blues', 'heart', 'feels', 'dope', 'makeitrain', 'wumbo',
       'firstclass', 'firstrate', 'topnotch', 'aweinspiring', 'superduper', 'dabomb', 'dashit', 'badass', 'bomb', 'popcorn', 'awesomesauce', 'awesomeness', 'sick',
       'sexy', 'brilliant', 'steampunk', 'bagpipes', 'piccolo', 'whee', 'vibe', 'banjo', 'harmony', 'harmonica', 'flute', 'dancing', 'dancin', 'ducky', 'approval', 'winning', 'okay',
-      'hunkydory', 'peach', 'divine', 'radiant', 'sublime', 'refined', 'foxy', 'allskate', 'rush', 'boston', 'murica', '2fer', 'boom', 'bitches', 'oar', 'hipster',
+      'hunkydory', 'peach', 'divine', 'radiant', 'sublime', 'refined', 'foxy', 'allskate', 'couplesskate', 'coupleskate', 'rush', 'boston', 'murica', '2fer', 'boom', 'bitches', 'oar', 'hipster',
       'hip', 'soul', 'soulful', 'cover', 'yummy', 'ohyeah', 'twist', 'shout', 'trippy', 'hot', 'country', 'stellar', 'smoove', 'pantydropper', 'baby', 'mmm', 'hooters',
       'tmbg', 'rhythm', 'kool', 'kewl', 'killer', 'biatch', 'woodblock', 'morecowbell', 'lesbian', 'lesbians', 'niceconnect', 'connect', 'kazoo', 'win', 'webejammin',
       'bellyrub', 'groove', 'gold', 'golden', 'twofer', 'phat', 'punkrock', 'punkrocker', 'merp', 'derp', 'herp-a-derp', 'narf', 'amazing', 'doabarrellroll', 'plusone',
@@ -6969,7 +7060,7 @@ var BOTCOMMANDS = {
       'off the chain', 'off the hook', 'out of sight', 'peachy keen', 'peachy-keen', 'offdahook', 'offthechain', 'offthehook', 'outofsight',
       'peachykeen', 'perf', 'phatness', 'phenom', 'prime-time', 'primo', 'rad', 'radical', 'rage', 'rancid', 'random', 'nice cover', 'nicecover', 'raw',
       'redonkulus', 'righteous', 'rocking', 'rock-solid', 'rollin', '3fer', '4fer', 'threefer', 'fourfer', 'nice2fer', 'amazeballs', 'craycray',
-      '5fer', '6fer', '7fer', '8fer', '9fer', '10fer', '11fer', '12fer',
+      '5fer', '6fer', '7fer', '8fer', '9fer', '10fer', '11fer', '12fer', '13fer', '14fer', '15fer', '16fer', '17fer', '18fer', '19fer', '20fer',
       'whizzbang', 'a1', 'aok', 'asskicking', 'bombass', 'fanfuckingtastic', 'primetime', 'rocksolid', 'instrumental', 'rockin', ':star:', 'star', 'rockstar', ':metal:',
       '10s', '00s', '90s', '80s', '70s', '60s', '50s', '40s', '30s', '20s', 'insane', 'clever', ':heart:', ':heart_decoration:', ':heart_eyes:', ':heart_eyes_cat:', ':heartbeat:',
       ':heartpulse:', ':hearts:', ':yellow_heart:', ':green_heart:', ':two_hearts:', ':revolving_hearts:', ':sparkling_heart:', ':blue_heart:', 'giddyup', 'rockabilly',
@@ -6992,7 +7083,7 @@ var BOTCOMMANDS = {
       'osfleftovers', 'osf', 'beard', 'dowop', 'productivitykiller', 'heyman', '420osf', 'osf420', 'twss', 'outfuckingstanding', 'modernspiritual', 'amodernspiritual',
       'realreggae', 'dadada', 'lalala', 'casio', 'joy', 'sunshine', 'whiledeezisaway', 'unintentional2fer', 'manbunhipsterstachepunchableface', 'taco',
       'tacos', 'faketastypoint', 'groovin', 'rollreminder', 'phishingforatastypoint', 'hipstermanbunpunchablefacestache','bnl','jewishamericanreggaerapperbeatboxer','magic',
-      'makemefries','mankiss','copasetic','bluesy','hoochiemama','fightingtrousers'
+      'makemefries','mankiss','copasetic','bluesy','hoochiemama','fightingtrousers','gdright','dailyplay','fistpump','manbunhipsterpunchableface',':peach:'
     ],
     rank: 'user',
     type: 'startsWith',
@@ -7862,6 +7953,7 @@ var STARTUP = {
 		MyUTIL.randomCommentSetTimer();												//Enable random comment timer
 		setInterval(function() { MyUTIL.botKeepAlive(); }, 1000 * 60 * 60);			//Timer fires every 60 mins to keep bot alive
 		setInterval(function() { MyUTIL.botKeepAlive2(); }, 1000 * 60);				//Timer fires every 1 mins to monitor bot alive status
+		MyAPI.setVolume(0.0);
 		MyVARS.botStarted = Date.now(); // dateadd getdate
 		//Try1: window.onbeforeunload
 		//setTimeout(function () { MyUTIL.sendChat("Larry the Bot V1.0 online"); }, 3000); 
@@ -7914,117 +8006,3 @@ if (!window.APIisRunning) {
 } else {
   setTimeout(function() {STARTUP.initbot();}, 1000);
 };
-
-/*
-var e = turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "Dude".toString()});
-turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", text: "TEST"});
-*/
-// Log all skip songs, Dj Removals, skipsong
-/*
-      	  setTimeout(function() { MyUTIL.skipSong(false); }, 500);
-      	  setTimeout(function() { MyUTIL.removeDJ(bootuser.id); }, 1000);
-*/
-
-// TESTING: DJ Waitlist ****  Issues with 
-// DONE: BotSnag grabsong
-// DONE: User split
-// DONE: SONG TOO LONG
-// DONE: SONG IN HIST
-// DONE: AFK DJ 
-// DONE: ImOut
-// DONE: Bot DJ
-
-// NEXT: THEME/GENRE  - No EDM or Kiddie songs.
-// NEXT: SONG NAME/ARTIST received :thumbsup: 2 :thumbsdown: 0 :heart: 0 
-// TODO: When a user joins the DJs, reset Lunch/Meeting breaks.
-// NEXT: SONG BAN LIST
-
-/*
-turntable.sendMessage({
-			"api": "pm.send", 
-			"receiverid": userid, 
-			"text": msg.toString()
-			});
-turntable.sendMessage({"api": "pm.send", "receiverid": "6047879a47c69b001bdbcd9c", "text": "Dude".toString()});
-
-So, you work for a company that delivers gravel now? Do you know anything about gravel pricing? The reason I ask is  I had a "friend" tell me he could get me a good deal on some gravel for my drive so I when ahead with it. Now, I fear it wasn't such a good deal, maybe not a bad deal, just not the "good" deal I thought I was getting.
-
-
-
-You sent June 28, 2019
-If you know pricing would you be able to answer these questions?
-How much should a ton of 57 gravel be? 
-What's your delivery charge per load? 
-How many tons per load?
-
-Kristi sent June 28, 2019
-The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons)
-You sent June 28, 2019
-So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
-
-Kristi sent June 28, 2019
-They stopped doing residential. Anything over 10 ton we will deliver , so yes we can do that.  It would be about $50 per load for delivery and they do up to 20tons per load.
-
-
-STALKER COMMANDS: 
--- Last Activity:
-	afktime @DemNutzzzz
-*/
-// :cherries: :pineapple: :banana: :eggplant: :peach: :melon: 
-/*	Three Mellon	500
-	Three Peach		100
-	Three Eggplant	50
-	Three Banana	20
-	Three Pineapple	15
-	Three cherries	10
-	cherry-cherry-any	5
-	cherry-any-any	2
-
-	C=Cherry	5	2	3
-	A=Pineapple	4	4	4
-	B=Banana	3	4	4
-	M=Mellon	1	1	1
-	E=Eggplant	3	3	1
-	L=Lemon		3	5	6
-	P=Peach		1	1	1
-	Total		20	20	20
-	slotCommand:
-*/
-//SECTION SLOTS: Slot machine game!
-//SECTION MyCOMMENTS: All comments:
-//SECTION SETTINGS: All local settings:
-//SECTION UTIL: Core functionality: MyUTIL.
-//SECTION API: Site specific code: MyAPI. ALL Platform dependant code goes
-//SECTION BotEVENTS: Events call from host:
-//SECTION USERS: All User data
-//SECTION MyROOM: All room settings:
-//SECTION WAITLIST: Manage the waitlist:
-//SECTION AFK:
-//SECTION CHAT:
-//SECTION COMMANDS: All Bot commands - The bot commands / meat:
-//SECTION PERM: User roles/permissions
-//SECTION STORAGE: Store & Load settings/users/banlist etc.
-//SECTION STARTUP: Init code:
-/*
-
-var map = new Map();
-map.set('name', 'John');
-map.set('id', 11);
-
-// Get the full content of the Map
-console.log(map); // Map { 'name' => 'John', 'id' => 11 }
-Get value of the Map using key
-
-var map = new Map();
-map.set('name', 'John');
-map.set('id', 11);
-console.log(map.get('name')); // John 
-console.log(map.get('id')); // 11
-JSON.stringify(map);
-
-Larry Top Roll Percentages: [:one: StormeCrow 31/50 62.00%] [:two: twizted_smilee 71/126 56.35%] [:three: Gringo Starr 104/186 55.91%] [:four: WhiteWidow 27/50 54.00%] [:five: TLD 104/186 55.91%]
-Larry [:six: given2fly 210/422 49.76%] [:seven: DeezNutzzzz 360/727 49.52%] [:eight: DocZ 463/940 49.26%] [:nine: Balloon Knot 171/350 48.86%] [
-The 57 is $22 per ton. The smallest load we deliver is 10 tons. Anything smaller needs to be picked up. (They got out of doing residential work so that's why they dont deliver less than 10 tons) So, you don't do residential or it's just not what you want to do? I had 35 tons delivered and spread off the tailgate. Would that be something you'd do?  (For future reference)
-
-
-*/
