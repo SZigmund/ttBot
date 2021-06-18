@@ -258,9 +258,11 @@ var MyVARS = {
   botAutoDJ: true,
   botIDs: ["604bb64b47b5e3001a8fd194", "6054d87447b5e3001bd535c7"],
   botMuted: false,
+  botName: "Karen",
   botStarted: null,
   //chatLink: "https://raw.githack.com/SZigmund/basicBot/master/lang/en.json",
-  chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/3dda247ba1ea666d95cac4d26e4a5c04810be769/lang/en.json",
+  //chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/3dda247ba1ea666d95cac4d26e4a5c04810be769/lang/en.json",
+  chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/01e92cbfed4b79eddeb5b63052219b4cf3ae36c4/lang/en.json",
   //old chatLink: "https://rawcdn.githack.com/SZigmund/basicBot/f4b1a9d30a7e9f022ef600dd41cae07a91797bad/lang/en.json",
   commandCooldown: 15,
   commandLiteral: ".",
@@ -331,7 +333,8 @@ var MyCOMMENTS = {
     "*** Thanks to Al Gore %%POINTFROM%% can give you this: *** :cake:",
     "*** Goose, take me to bed or lose me forever. (%%POINTFROM%%) *** :cake:",
     "*** If we weren’t on the internet %%POINTFROM%% would get you tin roof rusted. *** :cake:",
-    "*** :dancer: %%POINTFROM%% gave you a tasty point.  @Larry the Law will now dance the robot in your honor. :dancer: *** :cake:",
+    "*** :dancer: %%POINTFROM%% gave you a tasty point.  " + MyVARS.botName + " will now dance the merengue in your honor. :dancer: *** :cake:",
+    //"*** :dancer: %%POINTFROM%% gave you a tasty point.  " + MyVARS.botName + " will now dance the robot in your honor. :dancer: *** :cake:",
     "*** Beanbags are great and so are you!! (%%POINTFROM%%) *** :cake:",
     "*** That green jacket is within reach! (%%POINTFROM%%) *** :cake:",
     "*** You're smarter than Google and Mary Poppins combined. (%%POINTFROM%%) *** :cake:",
@@ -581,7 +584,7 @@ var MyCOMMENTS = {
     "Squats?  I thought you said let's do shots!",
     "I want a beer. I want a giant, ice-cold bottle of beer... and shower sex.",
     "Beer makes you feel the way you ought to feel without beer.",
-    "Larry no function beer well without.",
+    MyVARS.botName + " no function beer well without.",
     "Drunk is when you feel sophisticated, but can't pronounce it...",
     "My girlfriend's favorite beer is water. I mean Bud Light.",
     "It's a zombie apocalypse! Quick, grab the beer!",
@@ -729,7 +732,7 @@ var MyCOMMENTS = {
     "To error is human, to love is divine, to piss me off is a mistake!!",
     "You're right, it's my fault because I forgot you were an idiot.",
     "I'm not anti-social. I just have a strong aversion to B.S., drama and pretending.",
-    "I'm Larry. This is my brother, Darryl, and this is my other brother, Darryl",
+    "I'm " + MyVARS.botName + ". This is my brother, Darryl, and this is my other brother, Darryl",
     "My sex life is like a Ferrari...I don't have a Ferrari.",
     "I just saved a bunch of money on my car insurance by switching...my car into reverse and driving away from the accident. ",
     "No I'm not ignoring you. I suffer from selective hearing, usually triggered by idiots.",
@@ -1324,7 +1327,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
         'hellyeah', '27', '420', 'toke', 'fatty', 'blunt', 'joint', 'samples', 'doobie', 'oneeyedwilly', 'bongo', 'bingo', 'bangkok', 'tastytits', '=w=', ':guitar:', 'cl', 'carbonleaf',
         'festive', 'srv', 'motorhead', 'motörhead', 'pre2fer', 'pre-2fer', 'future2fer', 'phoenix', 'clhour', 'accordion', 'schwing', 'schawing', 'cool cover', 'coolcover',
         'boppin', 'bopping', 'jammin', 'jamming', 'tuba', 'powerballad', 'jukebox', 'word', 'classicrock', 'throwback', 'soultrain', 'train', '<3', 'bowie', 'dispatch',
-        'holycraplarryhasashitloadofcommands', 'thatswhatimtalkinabout', 'waycool', ':thumbsup:', ':fire:', ':+1:', 'cheers', 'drink', 'irish', 'celtic',
+        'holycrapkarenhasashitloadofcommands', 'thatswhatimtalkinabout', 'waycool', ':thumbsup:', ':fire:', ':+1:', 'cheers', 'drink', 'irish', 'celtic',
         'thunder', 'stpaddy', 'stpaddys', 'vegemite', 'clap', 'sob', 'sonofabitch', ':clap:', 'forthewin', 'ftw', ':cake:', 'badabing', ':boom:', 'electric',
         'mullet', 'eclectic', 'aaahhmmazing', 'crowdfavorite', 'celebrate', 'goodtimes', 'dmb', 'greatcover', 'tastycover', 'awesomecover', 'sweet2fer',
         'holycrapthisisareallylongsong', 'onehitwonder', 'riot', 'cherry', 'poppin', 'zootsuit', 'moustache', 'stache', 'dank', 'whackyinflatableflailingarmtubeman',
@@ -1345,7 +1348,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
         if (commandList.indexOf(cmd) < 0) return true;
         return false;
       }
-      // Else return a random Tasty command for Larry to use on his .tasty points:
+      // Else return a random Tasty command for bot to use on .tasty points:
       var idx = Math.floor(Math.random() * commandList.length);
       return commandList[idx];
     } 
@@ -1609,7 +1612,7 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       var randomMins = Math.floor((Math.random() * (MyVARS.randomCommentMax - MyVARS.randomCommentMin)) + MyVARS.randomCommentMin);
 	  if (MyUTIL.IsBotInDjList()) randomMins = MyVARS.randomCommentMin;
 	  setTimeout(function() { MyUTIL.randomCommentSend(); }, randomMins * 1000 * 60);
-	  MyUTIL.logInfo("Next random comment: (" + randomMins + ") " + MyUTIL.formatDate((Date.now() + (randomMins * 1000 * 60))));
+	  //MyUTIL.logInfo("Next random comment: (" + randomMins + ") " + MyUTIL.formatDate((Date.now() + (randomMins * 1000 * 60))));
     } 
 	catch (err) { MyUTIL.logException("MyUTIL.randomCommentSetTimer: " + err.message); }
   },
@@ -1636,7 +1639,6 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       var fuComment = "";
       if (MyAPI.CurrentUserID() === chat.uid) return;
       var chatmsg = chat.message.toUpperCase();
-      //MyUTIL.logDebug("Larry AI chatmsg: " + chatmsg);
       chatmsg = chatmsg.replace(/\W/g, '') // Remove all non-alphanumeric values
       chatmsg = chatmsg.replace(/[0-9]/g, ''); // Remove all numeric values
       chatmsg = chatmsg.replace(/'/g, '');
@@ -1648,12 +1650,13 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       chatmsg = chatmsg.replace(/-/g, '');
       chatmsg = chatmsg.replace(/ /g, '');
       chatmsg = chatmsg.replace(/THELAW/g, '');
-      chatmsg = chatmsg.replace(/FUCKBOT/g, "LARRY");
-      chatmsg = chatmsg.replace(/BOTT/g, "LARRY");
-      chatmsg = chatmsg.replace(/BOT/g, "LARRY");
+      chatmsg = chatmsg.replace(/FUCKBOT/g, MyVARS.botName.toUpperCase());
+      chatmsg = chatmsg.replace(/BOTT/g, MyVARS.botName.toUpperCase());
+      chatmsg = chatmsg.replace(/BOT/g, MyVARS.botName.toUpperCase());
       chatmsg = chatmsg.replace(/HOWIS/g, "HOWS"); // Convert 2 words to the contraction
       chatmsg = chatmsg.replace(/YOUARE/g, "YOURE"); // Convert 2 words to the contraction
-      chatmsg = chatmsg.replace(/LARRYIS/g, "LARRYS");
+      chatmsg = chatmsg.replace(/LARRYIS/g, MyVARS.botName.toUpperCase() + "S");
+      chatmsg = chatmsg.replace(/KARENIS/g, MyVARS.botName.toUpperCase() + "S");
       chatmsg = chatmsg.replace(/IAM/g, "IM");
       //MyUTIL.logDebug("Larry AI chatmsg: " + chatmsg);
 
@@ -1678,115 +1681,115 @@ var MyUTIL = {//javascript:(function(){$.getScript('');}());
       // If I were to slap you, it would be considered animal abuse!
       // You didn't fall out of the stupid tree. You were dragged through dumbass forest.
       // You're so fat, you could sell shade.
-      if (chatmsg.indexOf("USUCKLARRY") > -1) fuComment = "You're still sore about the other night %%FU%% :kiss:";
-      if (chatmsg.indexOf("DUCKULARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("DUMBASSLARRY") > -1) fuComment = "I'd slap you, but shit stains. %%FU%%";
-      if (chatmsg.indexOf("SHITHEADLARRY") > -1) fuComment = "I could eat a bowl of alphabet soup and shit out a smarter statement than that %%FU%%";
-      if (chatmsg.indexOf("STUPIDASSLARRY") > -1) fuComment = "I could eat a bowl of alphabet soup and shit out a smarter statement than that %%FU%%";
-      if (chatmsg.indexOf("LARRYSTFU") > -1) fuComment = "Make me %%FU%%";
-      if (chatmsg.indexOf("STFULARRY") > -1) fuComment = "Make me %%FU%%";
-      if (chatmsg.indexOf("SHUTUPLARRY") > -1) fuComment = "Make me %%FU%%";
-      if (chatmsg.indexOf("LARRYSHUTUP") > -1) fuComment = "Make me %%FU%%";
-      if (chatmsg.indexOf("STUFFITLARRY") > -1) fuComment = "That's not what you said the other night %%FU%% :kiss:";
-      if (chatmsg.indexOf("LARRYSTUFFIT") > -1) fuComment = "That's not what you said the other night %%FU%% :kiss:";
-      if (chatmsg.indexOf("WTFLARRY") > -1) fuComment = "I do what I wanna do %%FU%%";
-      if (chatmsg.indexOf("DAMNITLARRY") > -1) fuComment = "Why all the hate %%FU%%?";
-      if (chatmsg.indexOf("YOUREANASSHOLELARRY") > -1) fuComment = "You know it %%FU%%?";
-      if (chatmsg.indexOf("LARRYSANASS") > -1) fuComment = "You know it %%FU%%?";
-      if (chatmsg.indexOf("LARRYSONTHEJOB") > -1) fuComment = "Where the fuck else would I be %%FU%%?";
-      if (chatmsg.indexOf("LARRYSHARDCORE") > -1) fuComment = "You fucking know it %%FU%%";
-      if (chatmsg.indexOf("KNUCKLEHEADLARRY") > -1) fuComment = "I know you are but what am I %%FU%%";
-      if (chatmsg.indexOf("YOUREANASSLARRY") > -1) fuComment = "I'd like to see things from your point of view %%FU%%, too bad I can't shove my head that far up my ass!";
-      if (chatmsg.indexOf("WATCHYOURBACKLARRY") > -1) fuComment = "I'm scared %%FU%%";
-      if (chatmsg.indexOf("SICKOFYOULARRY") > -1) fuComment = "I thought a little girl from Kansas dropped a house on you %%FU%%";
-      if (chatmsg.indexOf("IMOVERYOULARRY") > -1) fuComment = "You are a sad, sorry little man and you have my pity %%FU%%";
-      if (chatmsg.indexOf("LARRYSADICK") > -1) fuComment = "People only say that because I have a big one %%FU%%.  Don't be so jealous.";
-      if (chatmsg.indexOf("LARRYSADONK") > -1) fuComment = "I’m jealous of people that don’t know you %%FU%%!";
-      if (chatmsg.indexOf("LARRYSABITCH") > -1) fuComment = "If ignorance ever goes up to $5 a barrel, I want drilling rights to your head %%FU%%";
-      if (chatmsg.indexOf("SHUTYOURMOUTHLARRY") > -1) fuComment = "You should eat some of your makeup so you can be pretty on the inside %%FU%%.";
-      if (chatmsg.indexOf("YOUREAJERKLARRY") > -1) fuComment = "%%FU%%, your mother was a hamster and your father smelt of elderberries!";
-      if (chatmsg.indexOf("YOURELAMELARRY") > -1) fuComment = "You are about as useful as a knitted condom %%FU%%!";
-      if (chatmsg.indexOf("YOUSTINKLARRY") > -1) fuComment = "You smell.......athletic %%FU%%!";
+      if (chatmsg.indexOf("USUCK" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You're still sore about the other night %%FU%% :kiss:";
+      if (chatmsg.indexOf("DUCKU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("DUMBASS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I'd slap you, but shit stains. %%FU%%";
+      if (chatmsg.indexOf("SHITHEAD" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I could eat a bowl of alphabet soup and shit out a smarter statement than that %%FU%%";
+      if (chatmsg.indexOf("STUPIDASS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I could eat a bowl of alphabet soup and shit out a smarter statement than that %%FU%%";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "STFU") > -1) fuComment = "Make me %%FU%%";
+      if (chatmsg.indexOf("STFU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Make me %%FU%%";
+      if (chatmsg.indexOf("SHUTUP" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Make me %%FU%%";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SHUTUP") > -1) fuComment = "Make me %%FU%%";
+      if (chatmsg.indexOf("STUFFIT" + MyVARS.botName.toUpperCase()) > -1) fuComment = "That's not what you said the other night %%FU%% :kiss:";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "STUFFIT") > -1) fuComment = "That's not what you said the other night %%FU%% :kiss:";
+      if (chatmsg.indexOf("WTF" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I do what I wanna do %%FU%%";
+      if (chatmsg.indexOf("DAMNIT" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Why all the hate %%FU%%?";
+      if (chatmsg.indexOf("YOUREANASSHOLE" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You know it %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SANASS") > -1) fuComment = "You know it %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SONTHEJOB") > -1) fuComment = "Where the fuck else would I be %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SHARDCORE") > -1) fuComment = "You fucking know it %%FU%%";
+      if (chatmsg.indexOf("KNUCKLEHEAD" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I know you are but what am I %%FU%%";
+      if (chatmsg.indexOf("YOUREANASS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I'd like to see things from your point of view %%FU%%, too bad I can't shove my head that far up my ass!";
+      if (chatmsg.indexOf("WATCHYOURBACK" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I'm scared %%FU%%";
+      if (chatmsg.indexOf("SICKOFYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I thought a little girl from Kansas dropped a house on you %%FU%%";
+      if (chatmsg.indexOf("IMOVERYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You are a sad, sorry little man and you have my pity %%FU%%";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SADICK") > -1) fuComment = "People only say that because I have a big one %%FU%%.  Don't be so jealous.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SADONK") > -1) fuComment = "I’m jealous of people that don’t know you %%FU%%!";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SABITCH") > -1) fuComment = "If ignorance ever goes up to $5 a barrel, I want drilling rights to your head %%FU%%";
+      if (chatmsg.indexOf("SHUTYOURMOUTH" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You should eat some of your makeup so you can be pretty on the inside %%FU%%.";
+      if (chatmsg.indexOf("YOUREAJERK" + MyVARS.botName.toUpperCase()) > -1) fuComment = "%%FU%%, your mother was a hamster and your father smelt of elderberries!";
+      if (chatmsg.indexOf("YOURELAME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You are about as useful as a knitted condom %%FU%%!";
+      if (chatmsg.indexOf("YOUSTINK" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You smell.......athletic %%FU%%!";
 
-      // Check for Piss off larry but attempt to ignore if it is don't piss off larry or do not piss off larry
-      if ((chatmsg.indexOf("PISSOFFLARRY") > -1) && (chatmsg.indexOf("TPISSOFFLARRY") < 0)) fuComment = "/me pisses on %%FU%%";
-      if (chatmsg.indexOf("YOURESTUPIDLARRY") > -1) fuComment = "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. I think you owe it an apology %%FU%%";
-      if (chatmsg.indexOf("FUCKINLARRY") > -1) fuComment = "Do you kiss you mother with that mouth %%FU%%?";
-      if (chatmsg.indexOf("FUCKINGLARRY") > -1) fuComment = "Do you kiss you mother with that mouth %%FU%%?";
-      if (chatmsg.indexOf("BITEMELARRY") > -1) fuComment = "I wouldn't give you the pleasure %%FU%%....You're a freak!";
+      // Check for Piss off bot but attempt to ignore if it is don't piss off bot or do not piss off bot
+      if ((chatmsg.indexOf("PISSOFF" + MyVARS.botName.toUpperCase()) > -1) && (chatmsg.indexOf("TPISSOFF" + MyVARS.botName.toUpperCase()) < 0)) fuComment = "/me pisses on %%FU%%";
+      if (chatmsg.indexOf("YOURESTUPID" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. I think you owe it an apology %%FU%%";
+      if (chatmsg.indexOf("FUCKIN" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Do you kiss you mother with that mouth %%FU%%?";
+      if (chatmsg.indexOf("FUCKING" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Do you kiss you mother with that mouth %%FU%%?";
+      if (chatmsg.indexOf("BITEME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I wouldn't give you the pleasure %%FU%%....You're a freak!";
       if (chatmsg.indexOf("MISSYOULITTLEBUDDY") > -1) fuComment = "I'll miss you too %%FU%%!";
       if (chatmsg.indexOf("MISSYALITTLEBUDDY") > -1) fuComment = "I'll miss you too %%FU%%!";
-      if (chatmsg.indexOf("IHATEYOULARRY") > -1) fuComment = "I don't exactly hate you %%FU%%, but if you were on fire and I had water, I'd drink it!";
-      if (chatmsg.indexOf("LARRYIHATEYOU") > -1) fuComment = "I don't exactly hate you %%FU%%, but if you were on fire and I had water, I'd drink it!";
-      if (chatmsg.indexOf("HATESLARRY") > -1) fuComment = "Well rest assured the feeling is mutual %%FU%%!  :kiss:";
-      if (chatmsg.indexOf("LARRYHATESMYNAME") > -1) fuComment = "I don't like the name %%FU%%, only fagots and sailors are called that name, from now on you're Gomer Pyle";
+      if (chatmsg.indexOf("IHATEYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I don't exactly hate you %%FU%%, but if you were on fire and I had water, I'd drink it!";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "IHATEYOU") > -1) fuComment = "I don't exactly hate you %%FU%%, but if you were on fire and I had water, I'd drink it!";
+      if (chatmsg.indexOf("HATES" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Well rest assured the feeling is mutual %%FU%%!  :kiss:";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "HATESMYNAME") > -1) fuComment = "I don't like the name %%FU%%, only fagots and sailors are called that name, from now on you're Gomer Pyle";
 
-      if (chatmsg.indexOf("SUCKITLARRY") > -1) fuComment = "I ain't got time to mess with that tiny shit %%FU%%!!!";
-      if (chatmsg.indexOf("SUCKMELARRY") > -1) fuComment = "I ain't got time to mess with that tiny shit %%FU%%!!!";
-      if (chatmsg.indexOf("EATSHITLARRY") > -1) fuComment = "Is this a typical diet for you humans %%FU%%.  You people are more fucked up than I thought!";
+      if (chatmsg.indexOf("SUCKIT" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I ain't got time to mess with that tiny shit %%FU%%!!!";
+      if (chatmsg.indexOf("SUCKME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I ain't got time to mess with that tiny shit %%FU%%!!!";
+      if (chatmsg.indexOf("EATSHIT" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Is this a typical diet for you humans %%FU%%.  You people are more fucked up than I thought!";
       //todo - many optoins here:  http://www.reddit.com/r/AskReddit/comments/24d8v8/whats_your_favorite_yes_phrase_like_does_a_bear/
-      if (chatmsg.indexOf("LARRYHATESME") > -1) fuComment = "If you were you, wouldn't you hate you too %%FU%%?";
-      if (chatmsg.indexOf("LARRYLIKESME") > -1) fuComment = "I tolerate you %%FU%%. It's not the same thing.";
-      if (chatmsg.indexOf("LARRYLOVESME") > -1) fuComment = "BAHAHAHA, You must be new around here %%FU%%?  You're killin me!!";
-      if (chatmsg.indexOf("DOYOUHATEMELARRY") > -1) fuComment = "Does the tin-man have a sheet metal cock %%FU%%?";
-      if (chatmsg.indexOf("DOYOULIKEMELARRY") > -1) fuComment = "Does Grizzly Adams have a beard %%FU%%?";
-      if (chatmsg.indexOf("DOYOULOVEMELARRY") > -1) fuComment = "Is a bear catholic? Does the pope shit in the woods %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "HATESME") > -1) fuComment = "If you were you, wouldn't you hate you too %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "LIKESME") > -1) fuComment = "I tolerate you %%FU%%. It's not the same thing.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "LOVESME") > -1) fuComment = "BAHAHAHA, You must be new around here %%FU%%?  You're killin me!!";
+      if (chatmsg.indexOf("DOYOUHATEME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Does the tin-man have a sheet metal cock %%FU%%?";
+      if (chatmsg.indexOf("DOYOULIKEME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Does Grizzly Adams have a beard %%FU%%?";
+      if (chatmsg.indexOf("DOYOULOVEME" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Is a bear catholic? Does the pope shit in the woods %%FU%%?";
 
-      if (chatmsg.indexOf("DAMNYOULARRY") > -1) fuComment = "Oh no, I have been Damned!!  In return, I too shall damn you %%FU%%";
-      if (chatmsg.indexOf("DAMNULARRY") > -1) fuComment = "Settle down %%FU%%. Get over yourself.";
-      if (chatmsg.indexOf("BUZZOFFLARRY") > -1) fuComment = "I'm not going anywhere %%FU%%. Sit back and just deal with it.  Or better yet, maybe we should chug on over to mamby pamby land, where maybe we can find some self-confidence for you, ya jackwagon!!.... Tissue?";
-      if (chatmsg.indexOf("LARRYBUZZOFF") > -1) fuComment = "I'm not going anywhere %%FU%%. Sit back and just deal with it.  Or better yet, maybe we should chug on over to mamby pamby land, where maybe we can find some self-confidence for you, ya jackwagon!!.... Tissue?";
-      if (chatmsg.indexOf("KISSMYASSLARRY") > -1) fuComment = "%%FU%%, I'm not into kissin' ass, just ask BK.";
+      if (chatmsg.indexOf("DAMNYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Oh no, I have been Damned!!  In return, I too shall damn you %%FU%%";
+      if (chatmsg.indexOf("DAMNU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Settle down %%FU%%. Get over yourself.";
+      if (chatmsg.indexOf("BUZZOFF" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I'm not going anywhere %%FU%%. Sit back and just deal with it.  Or better yet, maybe we should chug on over to mamby pamby land, where maybe we can find some self-confidence for you, ya jackwagon!!.... Tissue?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "BUZZOFF") > -1) fuComment = "I'm not going anywhere %%FU%%. Sit back and just deal with it.  Or better yet, maybe we should chug on over to mamby pamby land, where maybe we can find some self-confidence for you, ya jackwagon!!.... Tissue?";
+      if (chatmsg.indexOf("KISSMYASS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "%%FU%%, I'm not into kissin' ass, just ask BK.";
 
-      if (chatmsg.indexOf("HILARRY") > -1) fuComment = "Hi %%FU%%.";
-      if (chatmsg.indexOf("HELLOLARRY") > -1) fuComment = "Hello %%FU%%.";
+      if (chatmsg.indexOf("HI" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Hi %%FU%%.";
+      if (chatmsg.indexOf("HELLO" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Hello %%FU%%.";
       //todo - many optoins here:  http://www.neilstuff.com/howru100.html
-      if (chatmsg.indexOf("HOWYADOINLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWYADOINGLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWYOUDOINLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWYOUDOINGLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWAREYOULARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWAREULARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWRULARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWSLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWAREYOUDOINLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWAREYOUDOINGLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("HOWAREYOUTODAYLARRY") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("LARRYHOWAREYOU") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("LARRYHOWRYOU") > -1) fuComment = MyUTIL.howAreYouComment();
-      if (chatmsg.indexOf("LARRYHOWRU") > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWYADOIN" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWYADOING" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWYOUDOIN" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWYOUDOING" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWAREYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWAREU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWRU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWS" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWAREYOUDOIN" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWAREYOUDOING" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf("HOWAREYOUTODAY" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "HOWAREYOU") > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "HOWRYOU") > -1) fuComment = MyUTIL.howAreYouComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "HOWRU") > -1) fuComment = MyUTIL.howAreYouComment();
 
-      if (chatmsg.indexOf("LARRYSAFUCK") > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
-      if (chatmsg.indexOf("LARRYFUCKOFF") > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
-      if (chatmsg.indexOf("FUCKOFFLARRY") > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
-      if (chatmsg.indexOf("KICKSLARRY") > -1) fuComment = "Kicks %%FU%% right back!";
-      if (chatmsg.indexOf("HITSLARRY") > -1) fuComment = "Hits %%FU%% upside the head!";
-      if (chatmsg.indexOf("SMACKSLARRY") > -1) fuComment = "Smacks %%FU%% upside the head!";
-      if (chatmsg.indexOf("THANKSLARRY") > -1) fuComment = "You're welcome %%FU%%.";
-      if (chatmsg.indexOf("THXLARRY") > -1) fuComment = "You're welcome %%FU%%.";
-      if (chatmsg.indexOf("THANKYOULARRY") > -1) fuComment = "You're welcome %%FU%%.";
-      if (chatmsg.indexOf("LARRYSABADASS") > -1) fuComment = "You know it %%FU%%.";
-      if (chatmsg.indexOf("LARRYSTHESHIT") > -1) fuComment = "You know it %%FU%%.";
-      if (chatmsg.indexOf("LARRYSTHEBOMB") > -1) fuComment = "You know it %%FU%%.";
-      if (chatmsg.indexOf("LARRYROCKS") > -1) fuComment = "You know it %%FU%%.";
-      if (chatmsg.indexOf("LARRYSDABOMB") > -1) fuComment = "You know it %%FU%%.";
-      if (chatmsg.indexOf("YOUROCKLARRY") > -1) fuComment = "Thanks %%FU%% you're not so bad yourself.";
-      if (chatmsg.indexOf("LARRYDONTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
-      if (chatmsg.indexOf("LARRYDOESNTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
-      if (chatmsg.indexOf("LARRYDOESNOTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
-      if (chatmsg.indexOf("SHITHEADLARRY") > -1) fuComment = "I know you are but what am I %%FU%%?";
-      if (chatmsg.indexOf("LARRYSASHITHEAD") > -1) fuComment = "Takes one to know one %%FU%%!";
-      if (chatmsg.indexOf("LOLLARRY") > -1) fuComment = "I know, %%FU%%, I crack my shit up too!! :laughing:";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SAFUCK") > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "FUCKOFF") > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
+      if (chatmsg.indexOf("FUCKOFF" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Hey I have an idea: Why don't you go outside and play hide-and-go fuck yourself %%FU%%?!";
+      if (chatmsg.indexOf("KICKS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Kicks %%FU%% right back!";
+      if (chatmsg.indexOf("HITS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Hits %%FU%% upside the head!";
+      if (chatmsg.indexOf("SMACKS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Smacks %%FU%% upside the head!";
+      if (chatmsg.indexOf("THANKS" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You're welcome %%FU%%.";
+      if (chatmsg.indexOf("THX" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You're welcome %%FU%%.";
+      if (chatmsg.indexOf("THANKYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = "You're welcome %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SABADASS") > -1) fuComment = "You know it %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "STHESHIT") > -1) fuComment = "You know it %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "STHEBOMB") > -1) fuComment = "You know it %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "ROCKS") > -1) fuComment = "You know it %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SDABOMB") > -1) fuComment = "You know it %%FU%%.";
+      if (chatmsg.indexOf("YOUROCK" + MyVARS.botName.toUpperCase()) > -1) fuComment = "Thanks %%FU%% you're not so bad yourself.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "DONTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "DOESNTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "DOESNOTTAKEANYSHIT") > -1) fuComment = "Damn skippy I don't %%FU%%.";
+      if (chatmsg.indexOf("SHITHEAD" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I know you are but what am I %%FU%%?";
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "SASHITHEAD") > -1) fuComment = "Takes one to know one %%FU%%!";
+      if (chatmsg.indexOf("LOL" + MyVARS.botName.toUpperCase()) > -1) fuComment = "I know, %%FU%%, I crack my shit up too!! :laughing:";
 
-      if (chatmsg.indexOf("LARRYFU") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("LARRYFUCKU") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("FUCKLARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("LARRYFUCKYOU") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("FULARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("FUCKULARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("FUCKYOULARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("SCREWULARRY") > -1) fuComment = MyUTIL.fuComment();
-      if (chatmsg.indexOf("SCREWYOULARRY") > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "FU") > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "FUCKU") > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("FUCK" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf(MyVARS.botName.toUpperCase() + "FUCKYOU") > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("FU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("FUCKU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("FUCKYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("SCREWU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
+      if (chatmsg.indexOf("SCREWYOU" + MyVARS.botName.toUpperCase()) > -1) fuComment = MyUTIL.fuComment();
       if (fuComment.length > 0) setTimeout(function() {
         MyUTIL.sendChat(CHAT.subChat(fuComment, { fu: chat.un }));  }, 1000);
 
@@ -2662,7 +2665,9 @@ var BotEVENTS = {
 	      MyROOM.users.push(new USERS.User(MyAPI.CurrentDJID(), MyAPI.CurrentDJName())); 
 	    }
 		USERS.setRolled(MyAPI.CurrentDJID(), false);
-		USERS.checkRemoveLastDJ(); // See if last DJ requested to get removed.
+		var lastplay = MyAPI.getLastSong();
+		USERS.setRolled(lastplay.djID, false);
+		USERS.checkRemoveLastDJ(lastplay); // See if last DJ requested to get removed.
 		setTimeout(function() { MyUTIL.checkIsGoodSong(); }, 3000);
 		STORAGE.storeToStorage();
 		if (MyVARS.autoWoot === true) setTimeout(function() { MyAPI.WootThisSong(); }, (MyVARS.autoWootDelay * 1000));
@@ -2749,9 +2754,8 @@ var USERS = {
   },
 
   // See if user requested to get removed:
-  checkRemoveLastDJ: function() {
+  checkRemoveLastDJ: function(lastplay) {
     try {
-      var lastplay = MyAPI.getLastSong();
       //Check to see if DJ should get booted:
       if (USERS.getBootableID(lastplay.djUsername)) {
         var bootuser = USERS.lookupLocalUser(lastplay.djUsername);
@@ -7069,7 +7073,7 @@ var BOTCOMMANDS = {
       'hellyeah', '27', '420', 'toke', 'fatty', 'blunt', 'joint', 'samples', 'doobie', 'oneeyedwilly', 'bongo', 'bingo', 'bangkok', 'tastytits', '=w=', ':guitar:', 'cl', 'carbonleaf',
       'festive', 'srv', 'motorhead', 'motörhead', 'pre2fer', 'pre-2fer', 'future2fer', 'phoenix', 'clhour', 'accordion', 'schwing', 'schawing', 'cool cover', 'coolcover',
       'boppin', 'bopping', 'jammin', 'jamming', 'tuba', 'powerballad', 'jukebox', 'word', 'classicrock', 'throwback', 'soultrain', 'train', '<3', 'bowie', 'dispatch',
-      'holycraplarryhasashitloadofcommands', 'thatswhatimtalkinabout', 'waycool', ':thumbsup:', ':fire:', ':+1:', 'cheers', 'drink', 'irish', 'celtic',
+      'holycrapkarenhasashitloadofcommands', 'thatswhatimtalkinabout', 'waycool', ':thumbsup:', ':fire:', ':+1:', 'cheers', 'drink', 'irish', 'celtic',
       'thunder', 'stpaddy', 'stpaddys', 'vegemite', 'clap', 'sob', 'sonofabitch', ':clap:', 'forthewin', 'ftw', ':cake:', 'badabing', ':boom:', 'electric',
       'mullet', 'eclectic', 'aaahhmmazing', 'crowdfavorite', 'celebrate', 'goodtimes', 'dmb', 'greatcover', 'tastycover', 'awesomecover', 'sweet2fer',
       'holycrapthisisareallylongsong', 'onehitwonder', 'riot', 'cherry', 'poppin', 'zootsuit', 'moustache', 'stache', 'dank', 'whackyinflatableflailingarmtubeman',
@@ -7179,7 +7183,7 @@ var BOTCOMMANDS = {
       try {
         if (this.type === 'exact' && chat.message.length !== cmd.length) return void(0);
         if (!BOTCOMMANDS.executable(this.rank, chat)) return void(0);
-        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain MEETING: If you have to go afk type, .meeting or .lunch and Larry will remove you from line. When you return hop back in line and Larry will restore your position in line. If you leave the room for over 10 mins you'll lose your spot.");
+        MyUTIL.sendChatOrPM(chat.type, chat.uid, "Explain MEETING: If you have to go afk type, .meeting or .lunch and " + MyVARS.botName + " will remove you from line. When you return hop back in line and " + MyVARS.botName + " will restore your position in line. If you leave the room for over 10 mins you'll lose your spot.");
       } catch (err) {
         MyUTIL.logException("exmeeting: " + err.message);
       }
@@ -7425,7 +7429,7 @@ var BOTCOMMANDS = {
     }
   },
   eightballCommand: { //Added 04/01/2015 Zig
-    command: ['8ball', 'eightball', 'larry'],
+    command: ['8ball', 'eightball', 'larry','karen'],
     rank: 'user',
     type: 'startsWith',
     functionality: function(chat, cmd) {
@@ -7436,6 +7440,7 @@ var BOTCOMMANDS = {
         var magicResponse = MyUTIL.eightBallSelect();
         if (msg.length === cmd.length) return MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.eightballresponse2, {
           name: chat.un,
+		  botname: MyVARS.botName,
           response: magicResponse
         }));
         var myQuestion = msg.substring(cmd.length + 1);
@@ -7445,7 +7450,8 @@ var BOTCOMMANDS = {
         }));
         setTimeout(function() {
           MyUTIL.sendChat(CHAT.subChat(CHAT.chatMapping.eightballresponse1, {
-            response: magicResponse
+            botname: MyVARS.botName,
+			response: magicResponse
           }));
         }, 500);
       } catch (err) {
@@ -7941,6 +7947,7 @@ var STARTUP = {
         if (window.APIisRunning) return;
 		if (MyROOM.users.length > 0) return;  // Prevent loading twice
         window.APIisRunning = true;
+		MyVARS.botName = MyAPI.CurrentUserName();
 	    BotEVENTS.connectAPI();
         CHAT.loadChat();
 		STARTUP.monitorPageChange();
@@ -7955,6 +7962,7 @@ var STARTUP = {
 		setInterval(function() { MyUTIL.botKeepAlive2(); }, 1000 * 60);				//Timer fires every 1 mins to monitor bot alive status
 		MyAPI.setVolume(0.0);
 		MyVARS.botStarted = Date.now(); // dateadd getdate
+		MyUTIL.logInfo(MyVARS.botName + " ONLINE " + MyUTIL.formatDate(Date.now()));
 		//Try1: window.onbeforeunload
 		//setTimeout(function () { MyUTIL.sendChat("Larry the Bot V1.0 online"); }, 3000); 
       }
