@@ -455,7 +455,7 @@ turntable.sendMessage({api: 'pm.send', receiverid: "6047879a47c69b001bdbcd9c", t
   },
   userInDjList: function(uid) {  //  isOnDeck
     try {
-	  if (MyAPI.APIRoom.djids == null) return false;
+	  if (MyAPI.APIRoom == null || MyAPI.APIRoom.djids == null) return false;
 	  return (MyAPI.APIRoom.djids.indexOf(uid) > -1)
 	  //turntable.buddyList.room.djids.indexOf("6047879a47c69b001bdbcd9c") 
 	  //THIS APPEARS TO WORK ALSO: 
