@@ -1118,6 +1118,7 @@ var MyVARS = {
   welcome: true,
   welcomeForeignerMsg: false,
   autoSkipBlockedSongs: true,
+  codeVersion: "1.12",
 };
 
 //SECTION MyCOMMENTS: All comments:
@@ -6853,10 +6854,7 @@ var BOTCOMMANDS = {
     rank: 'mod',
     type: 'exact',
     functionality: function(chat, cmd) {
-      MyUTIL.sendChatOrPM(chat.type, chat.uid, CHAT.subChat(CHAT.chatMapping.online, {
-        botname: MyVARS.loggedInName,
-        version: MyVARS.version
-      }));
+      MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Version: ' + pts + MyVARS.codeVersion + '.');
     }
   },
 
