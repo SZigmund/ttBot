@@ -533,7 +533,7 @@ var SLOTS = {
 	maxBetsPercent: 50,
 	lemonWinType: "Percentage",		// Acceptable values: "Amount" or "Percentage"
 	lemonPercentageLow:  -25,		// Whole percentage; may be negative or positive
-	lemonPercentageHigh: -25,		// Whole percentage; may be negative or positive
+	lemonPercentageHigh:  25,		// Whole percentage; may be negative or positive
 	lemonAmountLow:      -5000,		// Whole dollar amount; may be negative or positive
 	lemonAmountHigh:      5000,		// Whole dollar amount; may be negative or positive
 	slotsDisabled: false,
@@ -687,7 +687,7 @@ var SLOTS = {
 	  var rangeLow = Math.min(low, high);
 	  var rangeHigh = Math.max(low, high);
 	  var lemonValue = rangeLow === rangeHigh ? rangeLow : Math.floor(Math.random() * (rangeHigh - rangeLow + 1)) + rangeLow;
-	  var wait = rangeLow === rangeHigh ? 0 : 15 * 1000;
+	  var wait = rangeLow === rangeHigh ? 0 : 30 * 1000;
 	  if (SLOTS.lemonWinType === "Amount") return { payout: lemonValue, wait: wait };
 	  if (SLOTS.lemonWinType === "Percentage") return { payout: Math.round(balance * (lemonValue / 100)), wait: wait };
 	  throw new Error('Invalid lemonWinType. Acceptable values are "Amount" or "Percentage".');
