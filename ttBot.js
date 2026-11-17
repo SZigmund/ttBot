@@ -531,7 +531,12 @@ var SLOTS = {
 	minBetsPerSpin: 1,				// Minimum amount a player can bet on one spin
 	maxBetsPerSpin: 500000,			// Maximum amount a player can bet on one spin
 	maxBetsPercent: 50,
-	lemonWinType: "Percentage",		// Acceptable values: "Amount" or "Percentage"
+	// Triple Lemon modes:
+	// "RandomChange" applies the existing random Amount or Percentage increase/decrease.
+	// "BankSwap" swaps current-game banks with a random player from the same human/bot group.
+	lemonMode: "BankSwap",
+	lemonBankSwapWaitSeconds: 60,	// Lock Slots for this long before completing and announcing a bank swap.
+	lemonWinType: "Percentage",		// RandomChange only. Acceptable values: "Amount" or "Percentage"
 	lemonPercentageLow:  -25,		// Whole percentage; may be negative or positive
 	lemonPercentageHigh:  25,		// Whole percentage; may be negative or positive
 	lemonAmountLow:      -5000,		// Whole dollar amount; may be negative or positive
@@ -591,10 +596,15 @@ var SLOTS = {
 	  chat.type = (SLOTS.privateSlotsMode === true) ? chat.type : 'chat';
 	  var mySpin =  SLOTS.spinTheWheel();
 	  SLOTS.displaySpin(chat, mySpin, bet, player);
-	  var payoutResult = SLOTS.calculatePayout(mySpin, bet, player.balance);
+	  var payoutResult = SLOTS.calculatePayout(mySpin, bet, player);
 	  var finishSpin = function() {
-		player = SLOTS.updatePlayerStats(player, payoutResult.payout, bet);
-		SLOTS.reportPayout(chat, payoutResult.payout, player, bet);
+		if (payoutResult.type === "BankSwap") {
+		  SLOTS.completeLemonBankSwap(player, payoutResult.swapPlayer, chat, bet);
+		}
+		else {
+		  player = SLOTS.updatePlayerStats(player, payoutResult.payout, bet);
+		  SLOTS.reportPayout(chat, payoutResult.payout, player, bet);
+		}
 		STORAGE.storeToStorage(false);
 	  };
 	  if (payoutResult.wait > 0) {
@@ -645,7 +655,7 @@ var SLOTS = {
     return player;
     }
   },
-  calculatePayout: function(mySpin, bet, balance) {
+  calculatePayout: function(mySpin, bet, player) {
     try			{
 	  //if ((mySpin === "EEE") && (SLOTS.letterToFruit("E") == ':eggplant:')) setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "http://i.imgur.com/oUMggG9.gif"); }, 1250);   //Dancing Eggplant / Eggplant Party
 	  //if (payout < 0.0) setTimeout(function () { MyUTIL.sendChatOrPM(chat.type, chat.uid, "https://static.wikia.nocookie.net/press-your-luck/images/f/f7/Whammy.gif"); }, 1250);   //Whammie standing there
@@ -660,7 +670,7 @@ var SLOTS = {
 	  else if (mySpin === "BBB") payout = bet * 20;		//Bananas
 	  else if (mySpin === "AAA") payout = bet * 15;		//Pineapple
 	  else if (mySpin === "CCC") payout = bet * 10;		//Cherries
-	  else if (mySpin === "LLL") return SLOTS.calculateLemonLawPayout(balance);	//Lemon
+	  else if (mySpin === "LLL") return SLOTS.calculateLemonResult(player);	//Lemon
 	  else if (((mySpin.match(/C/g) || []).length) === 2) payout = bet * 5;   // << strmatch Cherries
 	  else if (((mySpin.match(/C/g) || []).length) === 1) payout = bet * 2;   // << strmatch Cherries
 	  /* REVERSE SLOTS */
@@ -674,9 +684,17 @@ var SLOTS = {
 	  else if (((mySpin.match(/P/g) || []).length) === 2) return bet * 5;   // << strmatch Peaches
 	  else if (((mySpin.match(/P/g) || []).length) === 1) return bet * 2;   // << strmatch Peaches
 	  */
-	  return { payout: payout, wait: wait };
+	  return { type: "Payout", payout: payout, wait: wait };
 	}
     catch (err) {	MyUTIL.logException("SLOTS.calculatePayout: " + err.message); }
+  },
+  calculateLemonResult: function(player) {
+	try {
+	  if (SLOTS.lemonMode === "RandomChange") return SLOTS.calculateLemonLawPayout(player.balance);
+	  if (SLOTS.lemonMode === "BankSwap") return SLOTS.createLemonBankSwapResult(player);
+	  throw new Error('Invalid lemonMode. Acceptable values are "RandomChange" or "BankSwap".');
+	}
+	catch (err) {	MyUTIL.logException("SLOTS.calculateLemonResult: " + err.message); }
   },
   calculateLemonLawPayout: function(balance) {
     try {
@@ -688,11 +706,66 @@ var SLOTS = {
 	  var rangeHigh = Math.max(low, high);
 	  var lemonValue = rangeLow === rangeHigh ? rangeLow : Math.floor(Math.random() * (rangeHigh - rangeLow + 1)) + rangeLow;
 	  var wait = rangeLow === rangeHigh ? 0 : 30 * 1000;
-	  if (SLOTS.lemonWinType === "Amount") return { payout: lemonValue, wait: wait };
-	  if (SLOTS.lemonWinType === "Percentage") return { payout: Math.round(balance * (lemonValue / 100)), wait: wait };
+	  if (SLOTS.lemonWinType === "Amount") return { type: "Payout", payout: lemonValue, wait: wait };
+	  if (SLOTS.lemonWinType === "Percentage") return { type: "Payout", payout: Math.round(balance * (lemonValue / 100)), wait: wait };
 	  throw new Error('Invalid lemonWinType. Acceptable values are "Amount" or "Percentage".');
 	}
     catch (err) {	MyUTIL.logException("SLOTS.calculateLemonLawPayout: " + err.message); }
+  },
+  createLemonBankSwapResult: function(player) {
+	try {
+	  var swapPlayers = SLOTS.getLemonBankSwapPlayers(player);
+	  if (swapPlayers.length === 0) return { type: "Payout", payout: 0, wait: 0 };
+
+	  var swapPlayer = swapPlayers[Math.floor(Math.random() * swapPlayers.length)];
+	  return {
+		type: "BankSwap",
+		swapPlayer: swapPlayer,
+		wait: SLOTS.lemonBankSwapWaitSeconds * 1000
+	  };
+	}
+	catch (err) {	MyUTIL.logException("SLOTS.createLemonBankSwapResult: " + err.message); }
+  },
+  getLemonBankSwapPlayers: function(player) {
+	try {
+	  var playerIsBot = MyUTIL.IsBot(player.uid) || MyUTIL.IsPointWhore(player.uid);
+	  return SLOTS.Players.filter(function(swapPlayer) {
+		var swapPlayerIsBot = MyUTIL.IsBot(swapPlayer.uid) || MyUTIL.IsPointWhore(swapPlayer.uid);
+		var playedCurrentGame = (swapPlayer.winCount + swapPlayer.lossCount) > 0;
+		return swapPlayer.uid !== player.uid && swapPlayerIsBot === playerIsBot && playedCurrentGame;
+	  });
+	}
+	catch (err) {	MyUTIL.logException("SLOTS.getLemonBankSwapPlayers: " + err.message); }
+  },
+  completeLemonBankSwap: function(player, swapPlayer, chat, bet) {
+	try {
+	  // The spin bet belongs to the current player and is deducted before exchanging banks.
+	  var playerBankAfterBet = player.balance - bet;
+	  var swapPlayerBank = swapPlayer.balance;
+	  var playerWon = swapPlayerBank > playerBankAfterBet;
+
+	  player.balance = swapPlayerBank;
+	  swapPlayer.balance = playerBankAfterBet;
+	  SLOTS.updateLemonBankSwapStats(player, bet, playerWon);
+
+	  var swapUser = USERS.lookupLocalUser(swapPlayer.uid);
+	  var swapUsername = swapUser === false ? swapPlayer.uid : swapUser.username;
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, chat.un + " swaps banks with " + swapUsername + ":");
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, chat.un + "'s botcoin: " + MyUTIL.formatCurrency(player.balance, 0));
+	  MyUTIL.sendChatOrPM(chat.type, chat.uid, swapUsername + "'s botcoin: " + MyUTIL.formatCurrency(swapPlayer.balance, 0));
+	}
+	catch (err) {	MyUTIL.logException("SLOTS.completeLemonBankSwap: " + err.message); }
+  },
+  updateLemonBankSwapStats: function(player, bet, playerWon) {
+	try {
+	  player.winCount += playerWon ? 1 : 0;
+	  player.lossCount += playerWon ? 0 : 1;
+	  player.cashBet += bet;
+	  player.cashLoss += playerWon ? 0 : bet;
+	  player.dailyBets++;
+	  player.DOYLastPlay = MyUTIL.getDOY();
+	}
+	catch (err) {	MyUTIL.logException("SLOTS.updateLemonBankSwapStats: " + err.message); }
   },
   createPlayer: function(chat) {
     try {
@@ -848,6 +921,17 @@ var SLOTS = {
       case 'A': return ':beers:';			//  15
       case 'C': return ':beer:';			//  10
       case 'L': return ':coffee:';			//   0
+	  */
+	  /*
+	  FOOD:
+	  :rice:
+	  :meat_on_bone: 
+	  :hamburger: 
+	  :pizza: 
+	  :fries: 
+	  :poultry_leg: 
+	  :spaghetti:
+	  :corn:
 	  */
 
       /*
@@ -1118,7 +1202,7 @@ var MyVARS = {
   welcome: true,
   welcomeForeignerMsg: false,
   autoSkipBlockedSongs: true,
-  codeVersion: "1.12",
+  codeVersion: "1.13",
 };
 
 //SECTION MyCOMMENTS: All comments:
