@@ -534,7 +534,7 @@ var SLOTS = {
 	// Triple Lemon modes:
 	// "RandomChange" applies the existing random Amount or Percentage increase/decrease.
 	// "BankSwap" swaps current-game banks with a random player from the same human/bot group.
-	lemonMode: "BankSwap",
+	lemonMode: "RandomChange",
 	lemonBankSwapWaitSeconds: 60,	// Lock Slots for this long before completing and announcing a bank swap.
 	lemonWinType: "Percentage",		// RandomChange only. Acceptable values: "Amount" or "Percentage"
 	lemonPercentageLow:  -25,		// Whole percentage; may be negative or positive
