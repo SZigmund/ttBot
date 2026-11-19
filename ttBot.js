@@ -6938,7 +6938,7 @@ var BOTCOMMANDS = {
     rank: 'mod',
     type: 'exact',
     functionality: function(chat, cmd) {
-      MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Version: ' + pts + MyVARS.codeVersion + '.');
+      MyUTIL.sendChatOrPM(chat.type, chat.uid, 'Version: ' + MyVARS.codeVersion + '.');
     }
   },
 
